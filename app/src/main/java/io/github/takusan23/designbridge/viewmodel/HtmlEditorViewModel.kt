@@ -18,12 +18,16 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
 
     private val _htmlLiveData = MutableLiveData<String>()
     private val _htmlElementListLiveData = MutableLiveData<List<Element>>()
+    private val _htmlSpanElementListLiveData = MutableLiveData<List<Element>>()
 
     /** 編集中HTMLを返す */
     val htmlLiveData = _htmlLiveData as LiveData<String>
 
     /** HTMLの要素配列を返す */
     val htmlElementListLiveData = _htmlElementListLiveData as LiveData<List<Element>>
+
+    /** <span>を返す */
+    val htmlSpanElementListLiveData = _htmlSpanElementListLiveData as LiveData<List<Element>>
 
     /** Uriを受け取ってHtmlを変数に入れる */
     fun setHtmlFromUri(uri: Uri) {
@@ -35,9 +39,15 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
         sendHtml()
     }
 
-    /** HTMLの要素を編集する */
-    fun setElementText(elementId: String, text: String) {
-        document.getElementById(elementId).text(text)
+    /**
+     * HTMLの要素を編集する
+     * なんかspanのテキストを変更しようと思ったんだけどid振ってないから詰んだので
+     *
+     * @param parentElementId 親要素のID
+     * @param text 指定するテキスト
+     * */
+    fun setElementText(parentElementId: String, text: String) {
+        document.getElementById(parentElementId).child(0).text(text)
         sendHtml()
     }
 
@@ -45,6 +55,7 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
     private fun sendHtml() {
         _htmlLiveData.value = document.html()
         _htmlElementListLiveData.value = document.getElementsByTag("div")
+        _htmlSpanElementListLiveData.value = document.getElementsByTag("span")
     }
 
 }

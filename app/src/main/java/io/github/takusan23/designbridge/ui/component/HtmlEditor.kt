@@ -18,8 +18,7 @@ import io.github.takusan23.designbridge.R
 import org.jsoup.nodes.Element
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 
 
 /**
@@ -105,17 +104,18 @@ fun HtmlEditorNavigationBar(
 /**
  * HTMLの要素を一覧で表示する
  * @param elementList Htmlの要素の配列
- * @param onElementClick リストのアイテム押したときに呼ばれる
+ * @param onEditClick 編集ボタン押したとき
  * */
 @ExperimentalMaterialApi
 @Composable
 fun HtmlElementList(
     elementList: List<Element>,
-    onElementClick: (Element) -> Unit,
+    onEditClick: (Element) -> Unit,
 ) {
     LazyColumn {
+        // keyを明示的に指定することで変更を確実に検知
         items(elementList, key = { it.html() }) { element ->
-            HtmlElementListItem(element, onElementClick)
+            HtmlSpanListItem(element, onEditClick)
             Divider()
         }
     }
@@ -128,23 +128,26 @@ fun HtmlElementList(
  * */
 @ExperimentalMaterialApi
 @Composable
-private fun HtmlElementListItem(
+private fun HtmlSpanListItem(
     element: Element,
     onClick: (Element) -> Unit
 ) {
     Surface(modifier = Modifier.fillMaxWidth()) {
-        Row {
+        Row(
+            modifier = Modifier
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_text_fields_24),
+                contentDescription = "span"
+            )
             Column(
                 modifier = Modifier
                     .padding(10.dp)
                     .weight(1f)
             ) {
-                Text(text = element.id())
-                Text(
-                    text = element.text(),
-                    fontSize = 12.sp,
-                    maxLines = 1
-                )
+                Text(text = element.text())
             }
             IconButton(onClick = { onClick(element) }) {
                 Icon(

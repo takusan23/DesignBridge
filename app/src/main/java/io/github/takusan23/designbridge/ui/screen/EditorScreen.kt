@@ -16,7 +16,7 @@ import org.jsoup.nodes.Element
  * */
 @ExperimentalMaterialApi
 @Composable
-fun EditorScreen(viewModel: HtmlEditorViewModel, onElementClick: (Element) -> Unit) {
+fun EditorScreen(viewModel: HtmlEditorViewModel, onEditClick: (Element) -> Unit) {
     val htmlLiveData = viewModel.htmlLiveData.observeAsState()
 
     if (htmlLiveData.value == null) {
@@ -29,11 +29,11 @@ fun EditorScreen(viewModel: HtmlEditorViewModel, onElementClick: (Element) -> Un
     } else {
         Column {
             // HTML要素一覧
-            val htmlElementList = viewModel.htmlElementListLiveData.observeAsState()
+            val htmlElementList = viewModel.htmlSpanElementListLiveData.observeAsState()
             if (htmlElementList.value != null) {
                 HtmlElementList(
                     elementList = htmlElementList.value!!,
-                    onElementClick = onElementClick
+                    onEditClick = onEditClick
                 )
             }
         }
