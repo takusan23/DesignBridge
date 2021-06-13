@@ -17,8 +17,15 @@ import androidx.compose.ui.viewinterop.AndroidView
 import io.github.takusan23.designbridge.R
 import org.jsoup.nodes.Element
 import android.webkit.WebViewClient
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import io.github.takusan23.designbridge.tool.GetElementSrcOrText
 
 
@@ -222,7 +229,17 @@ fun ElementListScreenTab(
     TabRow(
         selectedTabIndex = selectIndex,
         contentColor = MaterialTheme.colors.primary,
-        backgroundColor = MaterialTheme.colors.background
+        backgroundColor = MaterialTheme.colors.background,
+        indicator = { tabPositions ->
+            // テキストの下に出るあの棒のやつ
+            Box(
+                modifier = Modifier
+                    .tabIndicatorOffset(tabPositions[selectIndex])
+                    .height(3.dp)
+                    .padding(start = 20.dp, end = 20.dp)
+                    .background(LocalContentColor.current, RoundedCornerShape(100, 100, 0, 0))
+            )
+        }
     ) {
         Tab(
             selected = 0 == selectIndex,

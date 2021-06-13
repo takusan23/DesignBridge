@@ -1,16 +1,20 @@
 package io.github.takusan23.designbridge.ui.screen
 
+import android.app.Activity
+import android.os.Build
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.takusan23.designbridge.tool.GetElementSrcOrText
+import io.github.takusan23.designbridge.tool.HideKeyboard
 import io.github.takusan23.designbridge.ui.component.HtmlEditorNavigationBar
 import io.github.takusan23.designbridge.ui.component.HtmlWebViewPreview
 import io.github.takusan23.designbridge.viewmodel.HtmlEditorViewModel
@@ -35,6 +39,11 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
     val editElementText = remember { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
+
+    // BottomSheet閉じたらキーボードも閉じる
+    if(LocalContext.current is Activity && !sheetState.isVisible){
+        HideKeyboard.hideKeyboard(LocalContext.current as Activity)
+    }
 
     ModalBottomSheetLayout(
         sheetState = sheetState,

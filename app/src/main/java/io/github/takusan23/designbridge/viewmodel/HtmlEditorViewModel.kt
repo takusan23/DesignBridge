@@ -40,7 +40,7 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
         val htmlString = inputStream.bufferedReader().readText()
         // HTMLスクレイピング
         Jsoup.parse(htmlString).also { doc ->
-            // spanにIDを振る。imgはすでにある
+            // spanにIDを振る。imgはcssで使ってるので変えるとまずい
             doc.getElementsByTag("span").forEachIndexed { index, element -> element.attr("id", "span_$index") }
             // doc.getElementsByTag("img").forEachIndexed { index, element -> element.attr("id", "img_$index") }
             document = doc

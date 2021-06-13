@@ -14,8 +14,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.takusan23.designbridge.ui.screen.HtmlEditorScreen
+import io.github.takusan23.designbridge.ui.screen.ProjectScreen
 import io.github.takusan23.designbridge.ui.theme.DesignBridgeTheme
 
+/**
+ * Activity一つでComposeを利用して複数の画面を扱う予定
+ * */
 class MainActivity : ComponentActivity() {
 
     @ExperimentalMaterialApi
@@ -23,9 +27,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DesignBridgeTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    HtmlEditorScreen(viewModel = viewModel())
+
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = "project") {
+                        composable("project") {
+                            // プロジェクト選択、作成画面
+                            ProjectScreen(viewModel = viewModel()) {
+
+                            }
+                        }
+                        composable("editor") {
+                            // 編集画面
+                            HtmlEditorScreen(viewModel = viewModel())
+                        }
+                    }
                 }
             }
         }
