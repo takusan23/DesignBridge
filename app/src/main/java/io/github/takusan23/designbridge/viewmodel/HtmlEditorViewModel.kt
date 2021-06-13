@@ -2,19 +2,25 @@ package io.github.takusan23.designbridge.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.io.File
 
-class HtmlEditorViewModel(application: Application) : AndroidViewModel(application) {
+/**
+ * HTML編集画面で使うViewModel
+ * @param editHtmlFilePath 編集対象のHTMLファイルのファイルパス
+ * */
+class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
 
     /** Jsoup */
-    lateinit var document: Document
+    var document: Document
 
     private val _htmlLiveData = MutableLiveData<String>()
     private val _htmlElementListLiveData = MutableLiveData<List<Element>>()
@@ -33,20 +39,21 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
     /** <img>を返す */
     val htmlImgElementListLiveData = _htmlImgElementListLiveData as LiveData<List<Element>>
 
-    /** Uriを受け取ってHtmlを変数に入れる */
-    fun setHtmlFromUri(uri: Uri) {
-        val contentResolver = context.contentResolver
-        val inputStream = contentResolver.openInputStream(uri) ?: return
-        val htmlString = inputStream.bufferedReader().readText()
+    init {
         // HTMLスクレイピング
-        Jsoup.parse(htmlString).also { doc ->
+        Jsoup.parse(File(editHtmlFilePath).readText()).also { doc ->
             // spanにIDを振る。imgはcssで使ってるので変えるとまずい
-            doc.getElementsByTag("span").forEachIndexed { index, element -> element.attr("id", "span_$index") }
-            // doc.getElementsByTag("img").forEachIndexed { index, element -> element.attr("id", "img_$index") }
+            doc.getElementsByTag("span").forEachIndexed { index, element ->
+                // 振ってあるなら別にいい
+                if (element.id().isEmpty()) {
+                    element.attr("id", "span_$index")
+                }
+            }
             document = doc
         }
         sendHtml()
     }
+
 
     /**
      * HTMLの要素を編集する
@@ -69,6 +76,11 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
         // srcsetは消す？
         document.getElementById(elementId).removeAttr("srcset")
         sendHtml()
+    }
+
+    /** HTMLを保存する。プレビューの際もこの関数を呼んでからプレビューが表示される */
+    fun saveHtml() {
+        File(editHtmlFilePath).writeText(document.html())
     }
 
     /** LiveDataへHTMLを送信する。Jsoupの編集結果を送信する */

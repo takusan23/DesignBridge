@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DesignBridge">
         <activity
+            android:name=".ProductionActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

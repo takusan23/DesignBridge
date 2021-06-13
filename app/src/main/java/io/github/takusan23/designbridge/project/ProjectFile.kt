@@ -11,7 +11,7 @@ import java.io.File
  *
  * ViewModelからこのクラスの関数を呼んだりする
  * */
-class ProjectFile(val context: Context) {
+class ProjectFile(private val context: Context) {
 
     /** このフォルダの中にプロジェクトフォルダを作成していく。 */
     private val projectParentFolder = File(context.getExternalFilesDir(null), "project").apply {
@@ -21,8 +21,7 @@ class ProjectFile(val context: Context) {
         }
     }
 
-
-    /** プロジェクトフォルダの変更を通知するFlow */
+    /** プロジェクト一覧の変更を通知するFlow */
     val projectParentFolderFlow = callbackFlow<List<File>> {
         // ファイル変更コールバック
         val fileObserver = object : FileObserver(projectParentFolder.path) {
@@ -56,6 +55,13 @@ class ProjectFile(val context: Context) {
      * 基本的にはflowでファイルの変更をキャッチできるはずなのでこの関数を使うことは多分無い
      * */
     fun getProjectList() = projectParentFolder.listFiles()?.toList() ?: listOf()
+
+    /**
+     * プロジェクト名のフォルダを取得する
+     *
+     * @param projectName プロジェクト名
+     * */
+    fun getProjectFolder(projectName: String) = File(projectParentFolder, projectName)
 
     /**
      * プロジェクトを削除する

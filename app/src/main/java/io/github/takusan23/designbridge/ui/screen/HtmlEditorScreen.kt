@@ -9,10 +9,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
+import io.github.takusan23.designbridge.R
 import io.github.takusan23.designbridge.tool.GetElementSrcOrText
 import io.github.takusan23.designbridge.tool.HideKeyboard
 import io.github.takusan23.designbridge.ui.component.HtmlEditorNavigationBar
@@ -41,7 +45,7 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
     val scope = rememberCoroutineScope()
 
     // BottomSheet閉じたらキーボードも閉じる
-    if(LocalContext.current is Activity && !sheetState.isVisible){
+    if (LocalContext.current is Activity && !sheetState.isVisible) {
         HideKeyboard.hideKeyboard(LocalContext.current as Activity)
     }
 
@@ -62,7 +66,31 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
         },
         content = {
             Scaffold(
-                bottomBar = { HtmlEditorNavigationBar(currentRouteName = currentRoute) { route -> navController.navigate(route) } },
+                bottomBar = {
+                    HtmlEditorNavigationBar(currentRouteName = currentRoute) { route ->
+                        when (route) {
+                            "preview" -> {
+                                // プレビュー時はHTMLを保存する
+                                viewModel.saveHtml()
+                                navController.navigate("preview") {
+                                    popUpTo("editor") { inclusive = true }
+                                }
+                            }
+                            "editor" -> navController.navigate("editor") {
+                                popUpTo("preview") { inclusive = true }
+                            }
+                        }
+                    }
+                },
+                floatingActionButton = {
+                    ExtendedFloatingActionButton(
+                        backgroundColor = MaterialTheme.colors.primary,
+                        text = { Text(text = "保存") },
+                        icon = { Icon(painter = painterResource(id = R.drawable.ic_outline_save_24), contentDescription = null) },
+                        onClick = { viewModel.saveHtml() }
+                    )
+                },
+                floatingActionButtonPosition = FabPosition.Center,
                 content = {
                     NavHost(navController = navController, startDestination = "editor") {
                         composable("editor") {
@@ -79,10 +107,7 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                         }
                         composable("preview") {
                             // プレビュー画面
-                            val html = viewModel.htmlLiveData.observeAsState()
-                            if (html.value != null) {
-                                HtmlWebViewPreview(html = html.value!!)
-                            }
+                            HtmlWebViewPreview(url = viewModel.editHtmlFilePath)
                         }
                     }
                 }

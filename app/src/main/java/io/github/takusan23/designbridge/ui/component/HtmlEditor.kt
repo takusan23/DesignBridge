@@ -58,13 +58,13 @@ fun OpenHtmlFileButton(
 
 /**
  * WebViewを利用してHTMLをプレビューする
- * @param html HTML本文
+ * @param url HTMLファイルパス
  * @param modifier Modifier
  * */
 @Composable
 fun HtmlWebViewPreview(
     modifier: Modifier = Modifier,
-    html: String,
+    url: String,
 ) {
     AndroidView(
         modifier = modifier,
@@ -75,8 +75,8 @@ fun HtmlWebViewPreview(
                 settings.builtInZoomControls = true
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
-                // loadUrl("takusan.negitoro.dev")
-                loadData(Base64.encodeToString(html.toByteArray(), Base64.NO_PADDING), "text/html", "base64")
+                settings.allowFileAccess = true
+                loadUrl(url)
             }
         }
     )

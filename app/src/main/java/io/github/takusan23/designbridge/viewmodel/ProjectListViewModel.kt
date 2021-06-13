@@ -29,4 +29,10 @@ class ProjectListViewModel(application: Application) : AndroidViewModel(applicat
      * */
     fun deleteProject(projectName: String) = projectFile.deleteProject(projectName)
 
+    /**
+     * プロジェクト名のフォルダを取得する
+     * @param projectName プロジェクト名
+     * */
+    fun getProjectFolder(projectName: String) = projectFile.getProjectFolder(projectName)
+
 }
