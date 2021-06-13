@@ -8,7 +8,7 @@ import java.io.File
 /**
  * プロジェクト一覧ViewModel
  * */
-class ProjectViewModel(application: Application) : AndroidViewModel(application) {
+class ProjectListViewModel(application: Application) : AndroidViewModel(application) {
 
     private val context = application.applicationContext
 

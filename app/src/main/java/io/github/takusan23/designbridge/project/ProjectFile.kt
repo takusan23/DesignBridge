@@ -32,6 +32,8 @@ class ProjectFile(val context: Context) {
         }
         // 監視開始
         fileObserver.startWatching()
+        // 初期値送信
+        trySend(getProjectList())
 
         // Flowがキャンセルされたら
         awaitClose { fileObserver.stopWatching() }

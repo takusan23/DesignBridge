@@ -10,7 +10,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import io.github.takusan23.designbridge.R
 import io.github.takusan23.designbridge.ui.component.FillTextButton
-import io.github.takusan23.designbridge.viewmodel.ProjectViewModel
+import io.github.takusan23.designbridge.viewmodel.ProjectListViewModel
 
 /**
  * メニュー。削除とか
@@ -18,7 +18,7 @@ import io.github.takusan23.designbridge.viewmodel.ProjectViewModel
  * @param viewModel プロジェクト一覧ViewModel
  * */
 @Composable
-fun ProjectMenuScreen(viewModel: ProjectViewModel, projectName: String) {
+fun ProjectMenuScreen(viewModel: ProjectListViewModel, projectName: String) {
     Column {
         FillTextButton(
             modifier = Modifier.padding(10.dp),

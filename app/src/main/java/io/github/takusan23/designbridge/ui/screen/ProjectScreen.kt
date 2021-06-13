@@ -1,19 +1,15 @@
 package io.github.takusan23.designbridge.ui.screen
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.takusan23.designbridge.R
 import io.github.takusan23.designbridge.ui.component.ProjectList
 import io.github.takusan23.designbridge.ui.component.TitleBar
-import io.github.takusan23.designbridge.viewmodel.ProjectViewModel
+import io.github.takusan23.designbridge.viewmodel.ProjectListViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -27,7 +23,7 @@ import java.io.File
  * */
 @ExperimentalMaterialApi
 @Composable
-fun ProjectScreen(viewModel: ProjectViewModel, onProjectClick: (File) -> Unit) {
+fun ProjectScreen(viewModel: ProjectListViewModel, onProjectClick: (File) -> Unit) {
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -36,22 +32,10 @@ fun ProjectScreen(viewModel: ProjectViewModel, onProjectClick: (File) -> Unit) {
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        // sheetShape = RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp),
         sheetContent = {
-            CreateNewProjectScreen { projectName ->
-                viewModel.createNewProject(projectName)
-                scope.launch { sheetState.hide() }
+            CreateNewProjectScreen {
+                viewModel.createNewProject(it)
             }
-/*
-            NavHost(navController = navController, startDestination = "create") {
-                composable("create") {
-                }
-                composable("menu/{project_name}") { entry ->
-                    val projectName = entry.arguments?.getString("project_name")!!
-                    ProjectMenuScreen(viewModel = viewModel, projectName = projectName)
-                }
-            }
-*/
         },
         content = {
             Scaffold(
@@ -70,19 +54,21 @@ fun ProjectScreen(viewModel: ProjectViewModel, onProjectClick: (File) -> Unit) {
                 },
                 content = {
                     // プロジェクト一覧をFlowで受け取る
-                    // val projectList = viewModel.projectListFlow.collectAsState(initial = listOf())
-                    // ProjectList(
-                    //     list = projectList.value,
-                    //     onProjectClick = onProjectClick,
-                    //     onMenuClick = { file ->
-                    //         // メニューを表示
-                    //         // navController.navigate("menu/${file.name}")
-                    //         scope.launch { sheetState.show() }
-                    //     }
-                    // )
+                    val projectList = viewModel.projectListFlow.collectAsState(initial = listOf())
+                    if (projectList.value.isNotEmpty()) {
+                        ProjectList(
+                            list = projectList.value,
+                            onProjectClick = onProjectClick,
+                            onMenuClick = { file ->
+                                // メニューを表示
+                                // navController.navigate("menu/${file.name}")
+                                scope.launch { sheetState.show() }
+                            }
+                        )
+                    }
                 }
             )
-        },
+        }
     )
 
 }
