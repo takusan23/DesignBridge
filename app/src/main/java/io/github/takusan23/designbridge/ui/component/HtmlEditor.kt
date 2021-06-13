@@ -19,6 +19,7 @@ import org.jsoup.nodes.Element
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
+import io.github.takusan23.designbridge.tool.GetElementSrcOrText
 
 
 /**
@@ -34,7 +35,7 @@ fun OpenHtmlFileButton(
     modifier: Modifier = Modifier,
     onResultFileUri: (Uri) -> Unit,
     contentType: String = "text/html",
-    buttonContent: @Composable RowScope.() -> Unit
+    buttonContent: @Composable RowScope.() -> Unit,
 ) {
     // Activity Result API
     val callback = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri ->
@@ -65,6 +66,8 @@ fun HtmlWebViewPreview(
                 setWebViewClient(WebViewClient())
                 settings.javaScriptEnabled = true
                 settings.builtInZoomControls = true
+                settings.loadWithOverviewMode = true
+                settings.useWideViewPort = true
                 // loadUrl("takusan.negitoro.dev")
                 loadData(Base64.encodeToString(html.toByteArray(), Base64.NO_PADDING), "text/html", "base64")
             }
@@ -113,8 +116,8 @@ fun HtmlElementList(
     onEditClick: (Element) -> Unit,
 ) {
     LazyColumn {
-        // keyを明示的に指定することで変更を確実に検知
-        items(elementList, key = { it.id() }) {
+        // keyが変更されたら再描画される仕組みらしい
+        items(elementList, key = { GetElementSrcOrText.getSrcOrText(it) }) {
             when (it.tagName()) {
                 "span" -> {
                     HtmlSpanListItem(it, onEditClick)
@@ -137,7 +140,7 @@ fun HtmlElementList(
 @Composable
 private fun HtmlSpanListItem(
     element: Element,
-    onClick: (Element) -> Unit
+    onClick: (Element) -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -176,7 +179,7 @@ private fun HtmlSpanListItem(
 @Composable
 private fun HtmlImgListItem(
     element: Element,
-    onClick: (Element) -> Unit
+    onClick: (Element) -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -188,7 +191,7 @@ private fun HtmlImgListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_outline_text_fields_24),
+                painter = painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24),
                 contentDescription = "span"
             )
             Column(
@@ -199,9 +202,45 @@ private fun HtmlImgListItem(
                 Text(text = element.attr("src"))
             }
             Icon(
-                painter = painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24),
+                painter = painterResource(id = R.drawable.ic_outline_edit_24),
                 contentDescription = "編集"
             )
         }
+    }
+}
+
+/**
+ * ElementListScreenで使うTabLayout
+ * @param selectIndex 選択位置。0から
+ * @param onTabClick タブを押したときに呼ばれる
+ * */
+@Composable
+fun ElementListScreenTab(
+    selectIndex: Int,
+    onTabClick: (Int) -> Unit,
+) {
+    TabRow(
+        selectedTabIndex = selectIndex,
+        contentColor = MaterialTheme.colors.primary,
+        backgroundColor = MaterialTheme.colors.background
+    ) {
+        Tab(
+            selected = 0 == selectIndex,
+            modifier = Modifier.padding(5.dp),
+            onClick = { onTabClick(0) },
+            content = {
+                Icon(painter = painterResource(id = R.drawable.ic_outline_text_fields_24), contentDescription = null)
+                Text(text = "文字の変更")
+            }
+        )
+        Tab(
+            selected = 1 == selectIndex,
+            modifier = Modifier.padding(5.dp),
+            onClick = { onTabClick(1) },
+            content = {
+                Icon(painter = painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24), contentDescription = null)
+                Text(text = "画像の変更")
+            }
+        )
     }
 }

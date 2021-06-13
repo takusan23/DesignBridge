@@ -40,9 +40,9 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
         val htmlString = inputStream.bufferedReader().readText()
         // HTMLスクレイピング
         Jsoup.parse(htmlString).also { doc ->
-            // span、imgにIDを振る
+            // spanにIDを振る。imgはすでにある
             doc.getElementsByTag("span").forEachIndexed { index, element -> element.attr("id", "span_$index") }
-            doc.getElementsByTag("img").forEachIndexed { index, element -> element.attr("id", "img_$index") }
+            // doc.getElementsByTag("img").forEachIndexed { index, element -> element.attr("id", "img_$index") }
             document = doc
         }
         sendHtml()
@@ -56,6 +56,18 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
      * */
     fun setElementText(elementId: String, text: String) {
         document.getElementById(elementId).text(text)
+        sendHtml()
+    }
+
+    /**
+     * HTMLのImg要素のsrcを変更する
+     * @param elementId 対象のID
+     * @param src 画像のURLなど
+     * */
+    fun setImgElementSrc(elementId: String, src: String) {
+        document.getElementById(elementId).attr("src", src)
+        // srcsetは消す？
+        document.getElementById(elementId).removeAttr("srcset")
         sendHtml()
     }
 

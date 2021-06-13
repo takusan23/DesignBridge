@@ -6,7 +6,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import io.github.takusan23.designbridge.ui.component.FillRow
-import io.github.takusan23.designbridge.ui.component.HtmlElementList
 import io.github.takusan23.designbridge.ui.component.OpenHtmlFileButton
 import io.github.takusan23.designbridge.viewmodel.HtmlEditorViewModel
 import org.jsoup.nodes.Element
@@ -29,11 +28,12 @@ fun EditorScreen(viewModel: HtmlEditorViewModel, onEditClick: (Element) -> Unit)
     } else {
         Column {
             // HTML要素一覧
-            val htmlElementList = viewModel.htmlSpanElementListLiveData.observeAsState()
-            val htmlImgList = viewModel.htmlImgElementListLiveData.observeAsState()
-            if (htmlElementList.value != null && htmlImgList.value != null) {
-                HtmlElementList(
-                    elementList = htmlElementList.value!!,
+            val spanElementList = viewModel.htmlSpanElementListLiveData.observeAsState()
+            val imgElementList = viewModel.htmlImgElementListLiveData.observeAsState()
+            if (spanElementList.value != null && imgElementList.value != null) {
+                ElementListScreen(
+                    spanElementList = spanElementList.value!!,
+                    imgElementList = imgElementList.value!!,
                     onEditClick = onEditClick
                 )
             }

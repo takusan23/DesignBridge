@@ -10,11 +10,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import io.github.takusan23.designbridge.tool.GetElementSrcOrText
 import io.github.takusan23.designbridge.ui.component.HtmlEditorNavigationBar
 import io.github.takusan23.designbridge.ui.component.HtmlWebViewPreview
 import io.github.takusan23.designbridge.viewmodel.HtmlEditorViewModel
 import kotlinx.coroutines.launch
-import org.jsoup.nodes.Element
 
 /**
  * HTML編集、プレビュー画面
@@ -31,6 +31,7 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
 
     /** 編集する要素のID */
     val editElementId = remember { mutableStateOf("") }
+    val editElementTagName = remember { mutableStateOf("") }
     val editElementText = remember { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
@@ -41,9 +42,12 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
             // 編集画面
             ElementEditScreen(
                 text = editElementText.value,
-                onEditTextChange = { text ->
-                    viewModel.setElementText(editElementId.value, text)
-                    editElementText.value = text
+                onEditTextChange = { inputValue ->
+                    editElementText.value = inputValue
+                    when (editElementTagName.value) {
+                        "span" -> viewModel.setElementText(editElementId.value, inputValue)
+                        "img" -> viewModel.setImgElementSrc(editElementId.value, inputValue)
+                    }
                 }
             )
         },
@@ -53,16 +57,19 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                 content = {
                     NavHost(navController = navController, startDestination = "editor") {
                         composable("editor") {
+                            // 編集画面
                             EditorScreen(
                                 viewModel = viewModel,
                                 onEditClick = {
                                     editElementId.value = it.id()
-                                    editElementText.value = it.text()
+                                    editElementText.value = GetElementSrcOrText.getSrcOrText(it)
+                                    editElementTagName.value = it.tagName()
                                     scope.launch { sheetState.show() }
                                 }
                             )
                         }
                         composable("preview") {
+                            // プレビュー画面
                             val html = viewModel.htmlLiveData.observeAsState()
                             if (html.value != null) {
                                 HtmlWebViewPreview(html = html.value!!)
