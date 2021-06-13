@@ -19,6 +19,7 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
     private val _htmlLiveData = MutableLiveData<String>()
     private val _htmlElementListLiveData = MutableLiveData<List<Element>>()
     private val _htmlSpanElementListLiveData = MutableLiveData<List<Element>>()
+    private val _htmlImgElementListLiveData = MutableLiveData<List<Element>>()
 
     /** 編集中HTMLを返す */
     val htmlLiveData = _htmlLiveData as LiveData<String>
@@ -29,25 +30,32 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
     /** <span>を返す */
     val htmlSpanElementListLiveData = _htmlSpanElementListLiveData as LiveData<List<Element>>
 
+    /** <img>を返す */
+    val htmlImgElementListLiveData = _htmlImgElementListLiveData as LiveData<List<Element>>
+
     /** Uriを受け取ってHtmlを変数に入れる */
     fun setHtmlFromUri(uri: Uri) {
         val contentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(uri) ?: return
         val htmlString = inputStream.bufferedReader().readText()
         // HTMLスクレイピング
-        document = Jsoup.parse(htmlString)
+        Jsoup.parse(htmlString).also { doc ->
+            // span、imgにIDを振る
+            doc.getElementsByTag("span").forEachIndexed { index, element -> element.attr("id", "span_$index") }
+            doc.getElementsByTag("img").forEachIndexed { index, element -> element.attr("id", "img_$index") }
+            document = doc
+        }
         sendHtml()
     }
 
     /**
      * HTMLの要素を編集する
-     * なんかspanのテキストを変更しようと思ったんだけどid振ってないから詰んだので
      *
-     * @param parentElementId 親要素のID
+     * @param elementId 要素のID
      * @param text 指定するテキスト
      * */
-    fun setElementText(parentElementId: String, text: String) {
-        document.getElementById(parentElementId).child(0).text(text)
+    fun setElementText(elementId: String, text: String) {
+        document.getElementById(elementId).text(text)
         sendHtml()
     }
 
@@ -56,6 +64,7 @@ class HtmlEditorViewModel(application: Application) : AndroidViewModel(applicati
         _htmlLiveData.value = document.html()
         _htmlElementListLiveData.value = document.getElementsByTag("div")
         _htmlSpanElementListLiveData.value = document.getElementsByTag("span")
+        _htmlImgElementListLiveData.value = document.getElementsByTag("img")
     }
 
 }

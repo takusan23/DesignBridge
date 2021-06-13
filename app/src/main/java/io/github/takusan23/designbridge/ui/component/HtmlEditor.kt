@@ -114,15 +114,22 @@ fun HtmlElementList(
 ) {
     LazyColumn {
         // keyを明示的に指定することで変更を確実に検知
-        items(elementList, key = { it.html() }) { element ->
-            HtmlSpanListItem(element, onEditClick)
+        items(elementList, key = { it.id() }) {
+            when (it.tagName()) {
+                "span" -> {
+                    HtmlSpanListItem(it, onEditClick)
+                }
+                "img" -> {
+                    HtmlImgListItem(it, onEditClick)
+                }
+            }
             Divider()
         }
     }
 }
 
 /**
- * Elementリストの各アイテム
+ * Elementリストの各アイテム。span版
  * @param element Html要素
  * @param onClick アイテム押したとき
  * */
@@ -132,7 +139,10 @@ private fun HtmlSpanListItem(
     element: Element,
     onClick: (Element) -> Unit
 ) {
-    Surface(modifier = Modifier.fillMaxWidth()) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { onClick(element) }
+    ) {
         Row(
             modifier = Modifier
                 .padding(10.dp),
@@ -149,12 +159,49 @@ private fun HtmlSpanListItem(
             ) {
                 Text(text = element.text())
             }
-            IconButton(onClick = { onClick(element) }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_outline_edit_24),
-                    contentDescription = "編集"
-                )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_edit_24),
+                contentDescription = "編集"
+            )
+        }
+    }
+}
+
+/**
+ * Elementリストの各アイテム。img版
+ * @param element Html要素
+ * @param onClick アイテム押したとき
+ * */
+@ExperimentalMaterialApi
+@Composable
+private fun HtmlImgListItem(
+    element: Element,
+    onClick: (Element) -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { onClick(element) }
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_text_fields_24),
+                contentDescription = "span"
+            )
+            Column(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .weight(1f)
+            ) {
+                Text(text = element.attr("src"))
             }
+            Icon(
+                painter = painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24),
+                contentDescription = "編集"
+            )
         }
     }
 }

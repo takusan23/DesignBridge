@@ -30,7 +30,8 @@ fun EditorScreen(viewModel: HtmlEditorViewModel, onEditClick: (Element) -> Unit)
         Column {
             // HTML要素一覧
             val htmlElementList = viewModel.htmlSpanElementListLiveData.observeAsState()
-            if (htmlElementList.value != null) {
+            val htmlImgList = viewModel.htmlImgElementListLiveData.observeAsState()
+            if (htmlElementList.value != null && htmlImgList.value != null) {
                 HtmlElementList(
                     elementList = htmlElementList.value!!,
                     onEditClick = onEditClick

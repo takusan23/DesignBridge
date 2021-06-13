@@ -56,7 +56,7 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                             EditorScreen(
                                 viewModel = viewModel,
                                 onEditClick = {
-                                    editElementId.value = it.parent().id()
+                                    editElementId.value = it.id()
                                     editElementText.value = it.text()
                                     scope.launch { sheetState.show() }
                                 }
