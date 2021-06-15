@@ -1,8 +1,6 @@
 package io.github.takusan23.designbridge.viewmodel
 
 import android.app.Application
-import android.net.Uri
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -27,7 +25,7 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
     private val _htmlLiveData = MutableLiveData<String>()
     private val _htmlElementListLiveData = MutableLiveData<List<Element>>()
     private val _htmlSpanElementListLiveData = MutableLiveData<List<Element>>()
-    private val _htmlImgElementListLiveData = MutableLiveData<List<Element>>()
+    private val _htmlImgOrVideoElementListLiveData = MutableLiveData<List<Element>>()
 
     /** 編集中HTMLを返す */
     val htmlLiveData = _htmlLiveData as LiveData<String>
@@ -38,8 +36,8 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
     /** <span>を返す */
     val htmlSpanElementListLiveData = _htmlSpanElementListLiveData as LiveData<List<Element>>
 
-    /** <img>を返す */
-    val htmlImgElementListLiveData = _htmlImgElementListLiveData as LiveData<List<Element>>
+    /** <img>と<video>を返す */
+    val htmlImgElementListLiveData = _htmlImgOrVideoElementListLiveData as LiveData<List<Element>>
 
     /** プロジェクト名 */
     val projectName = File(editHtmlFilePath).parentFile?.name!!
@@ -59,7 +57,6 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
         sendHtml()
     }
 
-
     /**
      * HTMLの要素を編集する
      *
@@ -77,9 +74,18 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
      * @param src 画像のURLなど
      * */
     fun setImgElementSrc(elementId: String, src: String) {
-        document.getElementById(elementId).attr("src", src)
-        // srcsetは消す？
-        document.getElementById(elementId).removeAttr("srcset")
+        // 拡張子がmp4ならタグ名をvideoへ
+        if (src.split(".").lastOrNull() == "mp4") {
+            document.getElementById(elementId).tagName("video")
+            document.getElementById(elementId).attr("src", src)
+            document.getElementById(elementId).attr("autoplay", true)
+            document.getElementById(elementId).attr("controls", true)
+        } else {
+            document.getElementById(elementId).tagName("img")
+            document.getElementById(elementId).attr("src", src)
+            // srcsetは消す？
+            document.getElementById(elementId).removeAttr("srcset")
+        }
         sendHtml()
     }
 
@@ -93,7 +99,7 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
         _htmlLiveData.value = document.html()
         _htmlElementListLiveData.value = document.getElementsByTag("div")
         _htmlSpanElementListLiveData.value = document.getElementsByTag("span")
-        _htmlImgElementListLiveData.value = document.getElementsByTag("img")
+        _htmlImgOrVideoElementListLiveData.value = document.getElementsByTag("img") + document.getElementsByTag("video")
     }
 
 }

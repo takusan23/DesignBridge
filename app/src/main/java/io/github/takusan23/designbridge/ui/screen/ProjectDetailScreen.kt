@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import io.github.takusan23.designbridge.ProductionActivity
 import io.github.takusan23.designbridge.R
+import io.github.takusan23.designbridge.ui.component.EmptyProjectFolderItem
 import io.github.takusan23.designbridge.ui.component.ProjectFolderList
 import io.github.takusan23.designbridge.ui.component.TitleBar
 import io.github.takusan23.designbridge.viewmodel.ProjectDetailViewModel
@@ -76,21 +77,26 @@ fun ProjectDetailScreen(
                 },
                 content = {
                     val projectItemList = viewModel.projectFolderItemFlow.collectAsState(initial = listOf())
-                    ProjectFolderList(
-                        list = projectItemList.value,
-                        onEditClick = onEditHtmlClick,
-                        onShowClick = {
-                            // 本番モード
-                            Intent(context, ProductionActivity::class.java).apply {
-                                putExtra("file_path", it.path)
-                                context.startActivity(this)
+                    if (projectItemList.value.isEmpty()) {
+                        // ファイル追加してメッセージ
+                        EmptyProjectFolderItem()
+                    } else {
+                        ProjectFolderList(
+                            list = projectItemList.value,
+                            onEditClick = onEditHtmlClick,
+                            onShowClick = {
+                                // 本番モード
+                                Intent(context, ProductionActivity::class.java).apply {
+                                    putExtra("file_path", it.path)
+                                    context.startActivity(this)
+                                }
+                            },
+                            onMenuClick = {
+                                currentMenuFileName.value = it.name
+                                scope.launch { sheetState.show() }
                             }
-                        },
-                        onMenuClick = {
-                            currentMenuFileName.value = it.name
-                            scope.launch { sheetState.show() }
-                        }
-                    )
+                        )
+                    }
                 }
             )
         }

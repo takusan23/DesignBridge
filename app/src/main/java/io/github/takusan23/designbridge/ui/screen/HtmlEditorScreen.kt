@@ -17,16 +17,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.takusan23.designbridge.R
+import io.github.takusan23.designbridge.data.EditElementData
 import io.github.takusan23.designbridge.tool.GetElementSrcOrText
 import io.github.takusan23.designbridge.tool.HideKeyboard
 import io.github.takusan23.designbridge.ui.component.HtmlEditorNavigationBar
 import io.github.takusan23.designbridge.ui.component.HtmlWebViewPreview
 import io.github.takusan23.designbridge.ui.screen.elementedit.ElementEditScreen
-import io.github.takusan23.designbridge.ui.screen.elementedit.ImgElementEditScreen
-import io.github.takusan23.designbridge.ui.screen.elementedit.SpanElementEditScreen
 import io.github.takusan23.designbridge.viewmodel.HtmlEditorViewModel
 import kotlinx.coroutines.launch
-import org.jsoup.nodes.Element
 
 /**
  * HTML編集、プレビュー画面
@@ -42,7 +40,9 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
     val currentRoute = currentBackStackEntry.value?.destination?.route
 
     /** 編集する要素 */
-    val editElement = remember { mutableStateOf<Element?>(null) }
+    val editElementData = remember { mutableStateOf<EditElementData?>(null) }
+    // 編集中テキスト
+    val editText = remember { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     // BottomSheet閉じたらキーボードも閉じる
@@ -55,11 +55,19 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
         sheetContent = {
             // 編集画面
             Box(modifier = Modifier.heightIn(100.dp)) {
-                if (editElement.value != null) {
+                if (editElementData.value != null) {
                     // Html要素編集画面
                     ElementEditScreen(
-                        element = editElement.value!!,
-                        projectName = viewModel.projectName
+                        projectName = viewModel.projectName,
+                        tagName = editElementData.value!!.elementTagName,
+                        textValue = editText.value,
+                        onTextChange = { tagName, text ->
+                            editText.value = text
+                            when (tagName) {
+                                "img", "video" -> viewModel.setImgElementSrc(editElementData.value!!.elementId, text)
+                                "span" -> viewModel.setElementText(editElementData.value!!.elementId, text)
+                            }
+                        }
                     )
                 }
             }
@@ -100,8 +108,16 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                             EditorScreen(
                                 viewModel = viewModel,
                                 onEditClick = {
-                                    editElement.value = it
-                                    scope.launch { sheetState.show() }
+                                    // 編集画面を開く
+                                    scope.launch {
+                                        val data = EditElementData(
+                                            elementId = it.id(),
+                                            elementTagName = it.tagName(),
+                                        )
+                                        editElementData.value = data
+                                        editText.value = GetElementSrcOrText.getSrcOrText(it)
+                                        sheetState.show()
+                                    }
                                 }
                             )
                         }

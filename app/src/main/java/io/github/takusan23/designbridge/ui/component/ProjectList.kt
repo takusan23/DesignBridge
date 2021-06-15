@@ -139,6 +139,7 @@ fun ProjectFolderListItem(
                 val painter = when (file.extension) {
                     "html" -> painterResource(id = R.drawable.ic_baseline_language_24)
                     "png", "jpg" -> painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24)
+                    "mp4" -> painterResource(id = R.drawable.ic_outline_local_movies_24)
                     else -> painterResource(id = R.drawable.ic_outline_insert_drive_file_24)
                 }
                 Icon(

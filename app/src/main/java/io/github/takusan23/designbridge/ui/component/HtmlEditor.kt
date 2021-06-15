@@ -1,7 +1,6 @@
 package io.github.takusan23.designbridge.ui.component
 
 import android.net.Uri
-import android.util.Base64
 import android.webkit.WebView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import io.github.takusan23.designbridge.R
 import org.jsoup.nodes.Element
@@ -21,11 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import io.github.takusan23.designbridge.tool.GetElementSrcOrText
 
 
@@ -76,6 +70,7 @@ fun HtmlWebViewPreview(
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
                 settings.allowFileAccess = true
+                settings.mediaPlaybackRequiresUserGesture = false
                 loadUrl(url)
             }
         }
@@ -123,14 +118,14 @@ fun HtmlElementList(
     onEditClick: (Element) -> Unit,
 ) {
     LazyColumn {
-        // keyが変更されたら再描画される仕組みらしい
-        items(elementList, key = { GetElementSrcOrText.getSrcOrText(it) }) {
+        // keyが変更されたら再描画される仕組みらしい。あと多分keyが重複するので適当に対策
+        items(elementList, key = { GetElementSrcOrText.getSrcOrText(it) + elementList.indexOf(it) }) {
             when (it.tagName()) {
                 "span" -> {
                     HtmlSpanListItem(it, onEditClick)
                 }
-                "img" -> {
-                    HtmlImgListItem(it, onEditClick)
+                "img", "video" -> {
+                    HtmlImgOrVideoListItem(it, onEditClick)
                 }
             }
             Divider()
@@ -184,7 +179,7 @@ private fun HtmlSpanListItem(
  * */
 @ExperimentalMaterialApi
 @Composable
-private fun HtmlImgListItem(
+private fun HtmlImgOrVideoListItem(
     element: Element,
     onClick: (Element) -> Unit,
 ) {
@@ -198,7 +193,11 @@ private fun HtmlImgListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24),
+                painter = if (element.tagName() == "video") {
+                    painterResource(id = R.drawable.ic_outline_local_movies_24)
+                } else {
+                    painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24)
+                },
                 contentDescription = "span"
             )
             Column(
@@ -256,7 +255,7 @@ fun ElementListScreenTab(
             onClick = { onTabClick(1) },
             content = {
                 Icon(painter = painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24), contentDescription = null)
-                Text(text = "画像の変更")
+                Text(text = "画像/動画の変更")
             }
         )
     }

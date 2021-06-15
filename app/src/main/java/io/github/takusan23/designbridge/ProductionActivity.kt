@@ -30,6 +30,7 @@ class ProductionActivity : AppCompatActivity() {
             settings.loadWithOverviewMode = true
             settings.useWideViewPort = true
             settings.allowFileAccess = true
+            settings.mediaPlaybackRequiresUserGesture = false
             loadUrl(filePath)
         }
 

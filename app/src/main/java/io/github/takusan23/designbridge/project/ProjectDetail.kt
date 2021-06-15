@@ -60,11 +60,11 @@ class ProjectDetail(private val context: Context, val projectName: String) {
     }
 
     /**
-     * プロジェクト内のファイルを返す
+     * プロジェクト内のファイルを返す。ついでにsortedByDescendingでhtmlファイルが上に来るように
      *
      * 基本的には変更を検知してFlowで送信するので
      * */
-    fun getProjectItemList() = projectFolder.listFiles()?.toList() ?: listOf()
+    fun getProjectItemList() = projectFolder.listFiles()?.toList()?.sortedByDescending { file -> file.extension == "html" } ?: listOf()
 
     /**
      * プロジェクト内のファイルを削除する
@@ -78,5 +78,11 @@ class ProjectDetail(private val context: Context, val projectName: String) {
      * @return png / jpg / gif の画像ファイルたち
      * */
     fun getProjectImageList() = getProjectItemList().filter { file -> file.extension == "png" || file.extension == "jpg" || file.extension == "gif" }
+
+    /**
+     * プロジェクト内の動画ファイルを返す
+     * @return mp4ファイルたち
+     * */
+    fun getProjectVideoList() = getProjectItemList().filter { file -> file.extension == "mp4" }
 
 }

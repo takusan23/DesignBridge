@@ -1,10 +1,14 @@
 package io.github.takusan23.designbridge.ui.screen
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.github.takusan23.designbridge.ui.component.ElementListScreenTab
 import io.github.takusan23.designbridge.ui.component.HtmlElementList
 import org.jsoup.nodes.Element
@@ -31,10 +35,13 @@ fun ElementListScreen(
             ElementListScreenTab(selectIndex = currentTabPos.value) { currentTabPos.value = it }
         },
         content = {
-            // HTML要素一覧表示
-            when (currentTabPos.value) {
-                0 -> HtmlElementList(elementList = spanElementList, onEditClick = onEditClick)
-                1 -> HtmlElementList(elementList = imgElementList, onEditClick = onEditClick)
+            // BottomNavBarの分引いておく
+            Box(modifier = Modifier.padding(bottom = 56.dp)) {
+                // HTML要素一覧表示
+                when (currentTabPos.value) {
+                    0 -> HtmlElementList(elementList = spanElementList, onEditClick = onEditClick)
+                    1 -> HtmlElementList(elementList = imgElementList, onEditClick = onEditClick)
+                }
             }
         }
     )
