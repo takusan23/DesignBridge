@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -38,6 +40,9 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
 
     /** <img>を返す */
     val htmlImgElementListLiveData = _htmlImgElementListLiveData as LiveData<List<Element>>
+
+    /** プロジェクト名 */
+    val projectName = File(editHtmlFilePath).parentFile?.name!!
 
     init {
         // HTMLスクレイピング
@@ -78,8 +83,8 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
         sendHtml()
     }
 
-    /** HTMLを保存する。プレビューの際もこの関数を呼んでからプレビューが表示される */
-    fun saveHtml() {
+    /** HTMLを保存する。プレビューの際もこの関数を呼んでからプレビューが表示される。一応サスペンド関数 */
+    suspend fun saveHtml() = withContext(Dispatchers.IO) {
         File(editHtmlFilePath).writeText(document.html())
     }
 

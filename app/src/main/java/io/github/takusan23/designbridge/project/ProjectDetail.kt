@@ -73,4 +73,10 @@ class ProjectDetail(private val context: Context, val projectName: String) {
      * */
     fun deleteFile(fileName: String) = File(projectFolder, fileName).deleteRecursively()
 
+    /**
+     * プロジェクト内の画像ファイルを返す
+     * @return png / jpg / gif の画像ファイルたち
+     * */
+    fun getProjectImageList() = getProjectItemList().filter { file -> file.extension == "png" || file.extension == "jpg" || file.extension == "gif" }
+
 }
