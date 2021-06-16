@@ -71,6 +71,7 @@ fun HtmlWebViewPreview(
                 settings.useWideViewPort = true
                 settings.allowFileAccess = true
                 settings.mediaPlaybackRequiresUserGesture = false
+                settings.displayZoomControls = false
                 loadUrl(url)
             }
         }

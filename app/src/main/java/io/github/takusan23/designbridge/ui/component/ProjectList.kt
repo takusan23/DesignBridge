@@ -165,11 +165,11 @@ fun ProjectFolderListItem(
                     modifier = Modifier
                         .padding(5.dp),
                 ) {
-                    TextButton(onClick = { onShowClick(file) }) {
+                    TextButton(onClick = { onShowClick(file) }, modifier = Modifier.weight(1f)) {
                         Icon(painter = painterResource(id = R.drawable.ic_baseline_launch_24), contentDescription = null)
                         Text(text = "画面表示(本番環境)")
                     }
-                    TextButton(onClick = { onEditClick(file) }) {
+                    TextButton(onClick = { onEditClick(file) }, modifier = Modifier.weight(1f)) {
                         Icon(painter = painterResource(id = R.drawable.ic_outline_edit_24), contentDescription = null)
                         Text(text = "テキスト、画像編集")
                     }

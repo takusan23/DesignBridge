@@ -6,26 +6,27 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.takusan23.designbridge.R
 import io.github.takusan23.designbridge.project.ProjectDetail
 
 /**
- * img要素を編集する画面
+ * img/video要素を編集する画面
  *
  * @param value 編集中テキスト
  * @param onSrcValue テキストが変更されたら呼ばれる
@@ -90,22 +91,36 @@ private fun ProjectImgOrVideoRow(projectName: String, onImageOrVideoClick: (Stri
     }
 
     Text(
-        text = "プロジェクト内の画像",
+        text = "プロジェクト内の画像/動画",
         modifier = Modifier.padding(5.dp),
         fontSize = 18.sp,
     )
     LazyRow(modifier = Modifier.padding(5.dp)) {
         items(imgList) { pair ->
-            Image(
-                modifier = Modifier
-                    .padding(5.dp)
-                    .width(100.dp)
-                    .aspectRatio(1.7f)
-                    .clickable { onImageOrVideoClick(pair.second) },
-                bitmap = pair.first.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-            )
+            Box {
+                Image(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .width(100.dp)
+                        .aspectRatio(1.7f)
+                        .clickable { onImageOrVideoClick(pair.second) },
+                    bitmap = pair.first.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                )
+                Icon(
+                    painter = if (pair.second.split(".").lastOrNull() == "mp4") {
+                        painterResource(id = R.drawable.ic_outline_local_movies_24)
+                    } else {
+                        painterResource(id = R.drawable.ic_outline_photo_size_select_actual_24)
+                    },
+                    contentDescription = "span",
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .align(Alignment.BottomEnd)
+                )
+
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package io.github.takusan23.designbridge.ui.screen
 import android.app.Activity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -123,7 +124,10 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                         }
                         composable("preview") {
                             // プレビュー画面
-                            HtmlWebViewPreview(url = viewModel.editHtmlFilePath)
+                            HtmlWebViewPreview(
+                                modifier = Modifier.padding(bottom = 56.dp),
+                                url = viewModel.editHtmlFilePath
+                            )
                         }
                     }
                 }
