@@ -26,6 +26,7 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
     private val _htmlElementListLiveData = MutableLiveData<List<Element>>()
     private val _htmlSpanElementListLiveData = MutableLiveData<List<Element>>()
     private val _htmlImgOrVideoElementListLiveData = MutableLiveData<List<Element>>()
+    private val _htmlInputElementListLiveData = MutableLiveData<List<Element>>()
 
     /** 編集中HTMLを返す */
     val htmlLiveData = _htmlLiveData as LiveData<String>
@@ -38,6 +39,9 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
 
     /** <img>と<video>を返す */
     val htmlImgElementListLiveData = _htmlImgOrVideoElementListLiveData as LiveData<List<Element>>
+
+    /** <input>を返す */
+    val htmlInputElementListLiveData = _htmlInputElementListLiveData as LiveData<List<Element>>
 
     /** プロジェクト名 */
     val projectName = File(editHtmlFilePath).parentFile?.name!!
@@ -58,6 +62,23 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
     }
 
     /**
+     * 要素のタグ名を変更する
+     *
+     * @param elementId 要素についてるID
+     * @param name 変更するタグ名
+     * */
+    fun changeElementTagName(elementId: String, name: String) {
+        val targetElement = document.getElementById(elementId)
+        targetElement.tagName(name)
+        // spanから変更になるかもなので消す
+        targetElement.text("")
+        // id以外の属性を削除
+        targetElement.attributes()
+            .filter { attribute -> attribute.key != "id" }
+            .forEach { attribute -> targetElement.removeAttr(attribute.key) }
+    }
+
+    /**
      * HTMLの要素を編集する
      *
      * @param elementId 要素のID
@@ -69,23 +90,30 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
     }
 
     /**
-     * HTMLのImg要素のsrcを変更する
+     * HTMLのimg/video要素のsrcを変更する
      * @param elementId 対象のID
      * @param src 画像のURLなど
      * */
-    fun setImgElementSrc(elementId: String, src: String) {
+    fun setImgOrVideoElementSrc(elementId: String, src: String) {
         // 拡張子がmp4ならタグ名をvideoへ
         if (src.split(".").lastOrNull() == "mp4") {
-            document.getElementById(elementId).tagName("video")
             document.getElementById(elementId).attr("src", src)
             document.getElementById(elementId).attr("autoplay", true)
             document.getElementById(elementId).attr("controls", true)
         } else {
-            document.getElementById(elementId).tagName("img")
             document.getElementById(elementId).attr("src", src)
-            // srcsetは消す？
-            document.getElementById(elementId).removeAttr("srcset")
         }
+        sendHtml()
+    }
+
+    /**
+     * HTMLのspan要素のvalueを変更する
+     *
+     * @param elementId 要素のID
+     * @param value 中身
+     * */
+    fun setInputElement(elementId: String, value: String) {
+        document.getElementById(elementId).attr("value", value)
         sendHtml()
     }
 
@@ -97,9 +125,13 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
     /** LiveDataへHTMLを送信する。Jsoupの編集結果を送信する */
     private fun sendHtml() {
         _htmlLiveData.value = document.html()
-        _htmlElementListLiveData.value = document.getElementsByTag("div")
-        _htmlSpanElementListLiveData.value = document.getElementsByTag("span")
-        _htmlImgOrVideoElementListLiveData.value = document.getElementsByTag("img") + document.getElementsByTag("video")
+        val spanList = document.getElementsByTag("span")
+        val imgList = document.getElementsByTag("img")
+        val videoList = document.getElementsByTag("video")
+        val inputList = document.getElementsByTag("input")
+        _htmlSpanElementListLiveData.value = spanList
+        _htmlImgOrVideoElementListLiveData.value = imgList + videoList
+        _htmlInputElementListLiveData.value =  inputList
     }
 
 }

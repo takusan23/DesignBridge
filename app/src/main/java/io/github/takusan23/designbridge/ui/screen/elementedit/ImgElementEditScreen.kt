@@ -9,9 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,39 +22,43 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.takusan23.designbridge.R
 import io.github.takusan23.designbridge.project.ProjectDetail
+import org.jsoup.nodes.Attributes
 
 /**
  * img/video要素を編集する画面
  *
- * @param value 編集中テキスト
+ * @param src 編集中テキスト
  * @param onSrcValue テキストが変更されたら呼ばれる
  * @param projectName プロジェクト名
  * */
 @Composable
 fun ImgElementEditScreen(
-    value: String,
+    src: String,
     projectName: String,
     onSrcValue: (String) -> Unit,
 ) {
     Column {
-        ElementEditComponent(
-            title = "画像/動画のリンクを編集",
-            hint = "インターネット上の画像/動画も利用できます",
-            text = value,
-            onChangeValue = {
-                onSrcValue(it)
-            },
+        OutlinedTextField(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+            value = src,
+            label = { Text(text = "画像、動画のパス。インターネット上の画像/動画のURLも利用できます") },
+            onValueChange = { onSrcValue(it) },
+            trailingIcon = {
+                // クリアボタン
+                IconButton(onClick = { onSrcValue("") }) {
+                    Icon(painter = painterResource(id = R.drawable.ic_outline_backspace_24), contentDescription = null)
+                }
+            }
         )
         // その他（プロジェクト内の画像を表示するなど）
         Divider(Modifier.padding(start = 5.dp, end = 5.dp))
         ProjectImgOrVideoRow(
             projectName = projectName,
-            onImageOrVideoClick = { imgName ->
-                onSrcValue(imgName)
-            }
+            onImageOrVideoClick = { imgName -> onSrcValue(imgName) }
         )
     }
-
 }
 
 /**
@@ -119,7 +121,6 @@ private fun ProjectImgOrVideoRow(projectName: String, onImageOrVideoClick: (Stri
                         .padding(5.dp)
                         .align(Alignment.BottomEnd)
                 )
-
             }
         }
     }

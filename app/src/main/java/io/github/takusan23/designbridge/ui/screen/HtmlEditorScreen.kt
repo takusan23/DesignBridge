@@ -18,7 +18,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.takusan23.designbridge.R
-import io.github.takusan23.designbridge.data.EditElementData
 import io.github.takusan23.designbridge.tool.GetElementSrcOrText
 import io.github.takusan23.designbridge.tool.HideKeyboard
 import io.github.takusan23.designbridge.ui.component.HtmlEditorNavigationBar
@@ -40,10 +39,12 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.destination?.route
 
-    /** 編集する要素 */
-    val editElementData = remember { mutableStateOf<EditElementData?>(null) }
+    // 編集中要素ID
+    val editId = remember { mutableStateOf("") }
     // 編集中テキスト
     val editText = remember { mutableStateOf("") }
+    // 編集中タグ
+    val editTagName = remember { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     // BottomSheet閉じたらキーボードも閉じる
@@ -51,23 +52,34 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
         HideKeyboard.hideKeyboard(LocalContext.current as Activity)
     }
 
+    /** ElementEditScreenで編集した値を編集中要素にセットする。 */
+    fun setElementContent() {
+        viewModel.changeElementTagName(editId.value, editTagName.value)
+        when (editTagName.value) {
+            "img", "video" -> viewModel.setImgOrVideoElementSrc(editId.value, editText.value)
+            "span" -> viewModel.setElementText(editId.value, editText.value)
+            "input" -> viewModel.setInputElement(editId.value, editText.value)
+        }
+    }
+
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
             // 編集画面
             Box(modifier = Modifier.heightIn(100.dp)) {
-                if (editElementData.value != null) {
+                if (editId.value.isNotEmpty()) {
                     // Html要素編集画面
                     ElementEditScreen(
                         projectName = viewModel.projectName,
-                        tagName = editElementData.value!!.elementTagName,
+                        tagName = editTagName.value,
                         textValue = editText.value,
-                        onTextChange = { tagName, text ->
+                        onTextChange = { text ->
                             editText.value = text
-                            when (tagName) {
-                                "img", "video" -> viewModel.setImgElementSrc(editElementData.value!!.elementId, text)
-                                "span" -> viewModel.setElementText(editElementData.value!!.elementId, text)
-                            }
+                            setElementContent()
+                        },
+                        onTagNameChange = { tagName ->
+                            editTagName.value = tagName
+                            setElementContent()
                         }
                     )
                 }
@@ -111,12 +123,9 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                                 onEditClick = {
                                     // 編集画面を開く
                                     scope.launch {
-                                        val data = EditElementData(
-                                            elementId = it.id(),
-                                            elementTagName = it.tagName(),
-                                        )
-                                        editElementData.value = data
-                                        editText.value = GetElementSrcOrText.getSrcOrText(it)
+                                        editText.value = GetElementSrcOrText.getSrcOrTextOrValue(it)
+                                        editId.value = it.id()
+                                        editTagName.value = it.tagName()
                                         sheetState.show()
                                     }
                                 }

@@ -16,10 +16,13 @@ fun EditorScreen(viewModel: HtmlEditorViewModel, onEditClick: (Element) -> Unit)
     // HTML要素一覧
     val spanElementList = viewModel.htmlSpanElementListLiveData.observeAsState()
     val imgElementList = viewModel.htmlImgElementListLiveData.observeAsState()
+    val inputElementList = viewModel.htmlInputElementListLiveData.observeAsState()
     if (spanElementList.value != null && imgElementList.value != null) {
         ElementListScreen(
             spanElementList = spanElementList.value!!,
             imgElementList = imgElementList.value!!,
+            inputElementList = inputElementList.value!!,
+            allElementList = spanElementList.value!! + imgElementList.value!! + inputElementList.value!!,
             onEditClick = onEditClick
         )
     }

@@ -4,9 +4,13 @@ import org.jsoup.nodes.Element
 
 object GetElementSrcOrText {
 
-    /** src属性かテキストを返す */
-    fun getSrcOrText(element: Element): String {
-        return if (element.hasAttr("src")) element.attr("src") else element.text()
+    /** src属性かテキストかvalue属性を返す */
+    fun getSrcOrTextOrValue(element: Element): String {
+        return when {
+            element.hasAttr("src") -> element.attr("src")
+            element.hasAttr("value") -> element.attr("value")
+            else -> element.text()
+        }
     }
 
 }

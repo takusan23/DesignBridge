@@ -41,9 +41,9 @@ fun ProjectScreen(
     val navController = rememberNavController()
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.id
-    // currentRouteの値（ページ遷移先の名前）が変わったらBottomSheetを表示させる
-    LaunchedEffect(currentRoute) {
-        sheetState.show()
+
+    fun showSheet() {
+        scope.launch { sheetState.show() }
     }
 
     ModalBottomSheetLayout(
@@ -74,7 +74,8 @@ fun ProjectScreen(
                         icon = { Icon(painter = painterResource(id = R.drawable.ic_outline_create_new_folder_24), contentDescription = null) },
                         onClick = {
                             // 作成画面を開く
-                            scope.launch { navController.navigate("create") }
+                            navController.navigate("create")
+                            showSheet()
                         }
                     )
                 },
@@ -86,7 +87,8 @@ fun ProjectScreen(
                         onEditClick = onEditClick,
                         onMenuClick = { file ->
                             // メニューを表示
-                            scope.launch { navController.navigate("menu/${file.name}") }
+                            navController.navigate("menu/${file.name}")
+                            showSheet()
                         }
                     )
                 }
