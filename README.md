@@ -9,10 +9,10 @@ Adobe XDで作った作品をWeb Exportプラグインを利用して生成し�
 </p>
 
 <p align="center">
-<img src="https://imgur.com/8xIjfWF.png" width="200">
-<img src="https://imgur.com/cjvjcGl.png" width="200">
-<img src="https://imgur.com/ktiZh1w.png" width="200">
-<img src="https://imgur.com/5WCddAh.png" width="200">
+<img src="https://imgur.com/nSgeFMj.png" width="200">
+<img src="https://imgur.com/G5tIY6c.png" width="200">
+<img src="https://imgur.com/GaaSSZd.png" width="200">
+<img src="https://imgur.com/3xG0pCg.png" width="200">
 </p>
 
 つまりHtmlを編集してプレビューできるアプリです
@@ -20,7 +20,11 @@ Adobe XDで作った作品をWeb Exportプラグインを利用して生成し�
 Android 5から起動可能。多分
 
 ## ダウンロード
-うまく行けばPlayStoreにも公開されるかも
+審査が通ったらPlayStoreからダウンロードできます。
+
+https://play.google.com/store/apps/details?id=io.github.takusan23.designbridge
+
+GitHub Releasesからもダウンロードできる？
 
 https://github.com/takusan23/DesignBridge/releases
 
