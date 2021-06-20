@@ -2,10 +2,7 @@ package io.github.takusan23.designbridge
 
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
-import android.view.WindowManager
+import android.view.*
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -17,13 +14,15 @@ import androidx.appcompat.app.AppCompatActivity
  * */
 class ProductionActivity : AppCompatActivity() {
 
+    private val webView by lazy { WebView(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 全画面モード
         initFullScreen()
 
         val filePath = intent.getStringExtra("file_path")!!
-        val webView = WebView(this).apply {
+        webView.apply {
             setWebViewClient(WebViewClient())
             settings.javaScriptEnabled = true
             settings.builtInZoomControls = true
@@ -37,6 +36,15 @@ class ProductionActivity : AppCompatActivity() {
 
         setContentView(webView)
 
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        // 戻ることができる場合はWebView戻って、履歴ない場合はなにもしない
+        if (event?.keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
+            webView.goBack()
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun initFullScreen() {

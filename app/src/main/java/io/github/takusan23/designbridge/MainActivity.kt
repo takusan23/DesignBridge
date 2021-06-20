@@ -1,22 +1,16 @@
 package io.github.takusan23.designbridge
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.Navigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
-import io.github.takusan23.designbridge.ui.screen.HtmlEditorScreen
-import io.github.takusan23.designbridge.ui.screen.ProjectDetailScreen
-import io.github.takusan23.designbridge.ui.screen.ProjectScreen
+import io.github.takusan23.designbridge.ui.screen.*
 import io.github.takusan23.designbridge.ui.theme.DesignBridgeTheme
 import io.github.takusan23.designbridge.viewmodel.factory.HtmlEditorViewModelFactory
 import io.github.takusan23.designbridge.viewmodel.factory.ProjectFolderViewModelFactory
@@ -40,6 +34,7 @@ class MainActivity : ComponentActivity() {
                             ProjectScreen(
                                 viewModel = viewModel(),
                                 onEditClick = { navController.navigate("project_detail/${it.name}") },
+                                onSettingMenuClick = { route -> navController.navigate(route) }
                             )
                         }
                         composable("project_detail/{project_name}") { entry ->
@@ -55,7 +50,15 @@ class MainActivity : ComponentActivity() {
                             // Htmlのパラメーターで受け取る。URLの一部で受け取るとファイルパスに妨害される
                             val htmlFilePath = entry.arguments?.getString("path")!!
                             // 編集画面
-                            HtmlEditorScreen(viewModel = viewModel(factory = HtmlEditorViewModelFactory(application,htmlFilePath)))
+                            HtmlEditorScreen(viewModel = viewModel(factory = HtmlEditorViewModelFactory(application, htmlFilePath)))
+                        }
+                        composable("license") {
+                            // ライセンス画面
+                            LicenseScreen(onBack = { navController.popBackStack() })
+                        }
+                        composable("konoapp") {
+                            // このアプリについて
+                            KonoAppScreen()
                         }
                     }
                 }

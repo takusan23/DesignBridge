@@ -2,6 +2,7 @@ package io.github.takusan23.designbridge.ui.component
 
 import android.net.Uri
 import android.webkit.WebView
+import android.webkit.WebView.setWebContentsDebuggingEnabled
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,6 +69,7 @@ fun HtmlWebViewPreview(
         factory = { context ->
             WebView(context).apply {
                 setWebViewClient(WebViewClient())
+                setWebContentsDebuggingEnabled(true)
                 settings.javaScriptEnabled = true
                 settings.builtInZoomControls = true
                 settings.loadWithOverviewMode = true
@@ -239,6 +241,7 @@ fun ElementFilterChip(
             val isSelected = currentPos == index
             OutlinedButton(
                 modifier = Modifier.padding(5.dp),
+                shape = RoundedCornerShape(50),
                 border = if (isSelected) BorderStroke(1.dp, MaterialTheme.colors.primary) else ButtonDefaults.outlinedBorder,
                 onClick = { onClick(index) },
                 content = {

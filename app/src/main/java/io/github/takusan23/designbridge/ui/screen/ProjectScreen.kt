@@ -1,9 +1,7 @@
 package io.github.takusan23.designbridge.ui.screen
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import io.github.takusan23.designbridge.R
 import io.github.takusan23.designbridge.ui.component.ProjectList
 import io.github.takusan23.designbridge.ui.component.TitleBar
+import io.github.takusan23.designbridge.ui.component.TitleBarDropDown
 import io.github.takusan23.designbridge.viewmodel.ProjectListViewModel
 import kotlinx.coroutines.launch
 import java.io.File
@@ -27,12 +26,14 @@ import java.io.File
  *
  * @param viewModel プロジェクト一覧ViewModel
  * @param onEditClick 編集ボタンを押したとき
+ * @param onSettingMenuClick 右上の設定押したときに出てくるドロップダウンメニューの項目を押したときに呼ばれる。引数はそのままnavigate()へ
  * */
 @ExperimentalMaterialApi
 @Composable
 fun ProjectScreen(
     viewModel: ProjectListViewModel,
     onEditClick: (File) -> Unit,
+    onSettingMenuClick: (String) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -42,8 +43,14 @@ fun ProjectScreen(
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.id
 
+    /** BottomSheetを表示 */
     fun showSheet() {
         scope.launch { sheetState.show() }
+    }
+
+    /** BottomSheetを非表示 */
+    fun hideSheet() {
+        scope.launch { sheetState.hide() }
     }
 
     ModalBottomSheetLayout(
@@ -54,7 +61,10 @@ fun ProjectScreen(
                 NavHost(navController = navController, startDestination = "create") {
                     composable("create") {
                         // 新規作成画面
-                        CreateNewProjectScreen { projectName -> viewModel.createNewProject(projectName) }
+                        CreateNewProjectScreen { projectName ->
+                            viewModel.createNewProject(projectName)
+                            hideSheet()
+                        }
                     }
                     composable("menu/{project_name}") { entry ->
                         val projectName = entry.arguments?.getString("project_name")!!
@@ -66,7 +76,28 @@ fun ProjectScreen(
         },
         content = {
             Scaffold(
-                topBar = { TitleBar(title = { Text(text = "プロジェクト一覧") }) },
+                topBar = {
+                    TitleBar(
+                        title = { Text(text = "プロジェクト一覧") },
+                        actions = {
+                            // 設定押したときのメニューを展開するか
+                            val isShowMenu = remember { mutableStateOf(false) }
+                            // メニューの中身
+                            val menuMap = mapOf(
+                                "ライセンス" to "license",
+                                "このアプリについて" to "konoapp"
+                            )
+                            IconButton(onClick = { isShowMenu.value = !isShowMenu.value }) { Icon(painter = painterResource(id = R.drawable.ic_outline_settings_24), contentDescription = null) }
+                            // ドロップダウンメニュー
+                            TitleBarDropDown(
+                                isShowMenu = isShowMenu.value,
+                                menuMap = menuMap,
+                                onMenuClick = { onSettingMenuClick(it) },
+                                onShow = { isShowMenu.value = false }
+                            )
+                        }
+                    )
+                },
                 floatingActionButton = {
                     ExtendedFloatingActionButton(
                         backgroundColor = MaterialTheme.colors.primary,
