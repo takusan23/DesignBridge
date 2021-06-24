@@ -3,6 +3,7 @@ package io.github.takusan23.designbridge.tool
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import java.io.File
 
 /** ファイル関係 */
 object FileTool {
@@ -43,6 +44,27 @@ object FileTool {
      * */
     fun byteToMB(byte: Long): Float {
         return String.format("%.2f", byte / 1024f / 1024f).toFloat()
+    }
+
+    /**
+     * 指定したUriを指定パスにコピーする
+     *
+     * @param context
+     * @param copyFolderPath コピー先
+     * @param uri Uri
+     * */
+    fun uriFileCopy(context: Context, uri: Uri, copyFolderPath: String) {
+        val contentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(uri)
+        // ファイル名
+        val fileName = getFileNameFromUri(context, uri)
+        // 書き込む
+        val file = File(copyFolderPath, fileName).apply { createNewFile() }
+        val outputStream = file.outputStream()
+        // コピー
+        inputStream?.copyTo(outputStream)
+        inputStream?.close()
+        outputStream.close()
     }
 
 }

@@ -49,13 +49,6 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
     init {
         // HTMLスクレイピング
         Jsoup.parse(File(editHtmlFilePath).readText()).also { doc ->
-            // spanにIDを振る。imgはcssで使ってるので変えるとまずい
-            doc.getElementsByTag("span").forEachIndexed { index, element ->
-                // 振ってあるなら別にいい
-                if (element.id().isEmpty()) {
-                    element.attr("id", "span_$index")
-                }
-            }
             document = doc
         }
         sendHtml()
@@ -72,10 +65,6 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
         targetElement.tagName(name)
         // spanから変更になるかもなので消す
         targetElement.text("")
-        // id以外の属性を削除
-        targetElement.attributes()
-            .filter { attribute -> attribute.key != "id" }
-            .forEach { attribute -> targetElement.removeAttr(attribute.key) }
     }
 
     /**

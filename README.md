@@ -5,6 +5,10 @@ Adobe XDで作った作品をWeb Exportプラグインを利用して生成し�
 </p>
 
 <p align="center">
+実験的にxdファイルをHTMLに変換する機能もあったりする？
+</p>
+
+<p align="center">
 画像の部分を動画に置き換えることもできます。
 </p>
 
@@ -51,6 +55,10 @@ GoogleがScoped Storageを導入したのでドキュメントフォルダへア
 ## 使用しているAndroid Studio
 安定版ではComposeを利用しているため多分開けません。
 Android StudioのBeta版を入れてください。
+
+## マルチモジュールプロジェクト
+xdファイルからHTMLを構築するコードは`designtalk`モジュール内に書いてあります。  
+`app`モジュールはそれ以外。  
 
 ## ビルド方法
 - zipファイルをダウンロードするなり、git cloneするなりでこのリポジトリの中身をダウンロードします。

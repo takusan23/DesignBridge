@@ -3,7 +3,11 @@ package io.github.takusan23.designbridge.viewmodel
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import io.github.takusan23.designbridge.project.ProjectDetail
+import io.github.takusan23.designbridge.tool.FileTool
+import io.github.takusan23.designbridge.xdhtml.XdFileToHTML
+import kotlinx.coroutines.launch
 
 /**
  * プロジェクトの中身を表示する画面のViewModel
@@ -31,5 +35,12 @@ class ProjectDetailViewModel(application: Application, val projectName: String) 
      * @param fileName ファイル名
      * */
     fun deleteFile(fileName: String) = projectFolder.deleteFile(fileName)
+
+    /**
+     * xdファイルを取り込む
+     *
+     * @param uri StorageAccessFramework等でファイルを選択するとUriがもらえるのでそれ
+     * */
+    fun importXDFile(uri: Uri) = viewModelScope.launch { projectFolder.importXDFile(uri) }
 
 }

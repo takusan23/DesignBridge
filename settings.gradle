@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "DesignBridge"
 include ':app'
+include ':designtalk'

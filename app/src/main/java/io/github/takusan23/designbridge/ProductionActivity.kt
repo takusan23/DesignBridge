@@ -31,7 +31,7 @@ class ProductionActivity : AppCompatActivity() {
             settings.allowFileAccess = true
             settings.mediaPlaybackRequiresUserGesture = false
             settings.displayZoomControls = false
-            loadUrl(filePath)
+            loadUrl("file://$filePath")
         }
 
         setContentView(webView)

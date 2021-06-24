@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.FileObserver
 import io.github.takusan23.designbridge.tool.FileTool
+import io.github.takusan23.designbridge.xdhtml.XdFileToHTML
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
@@ -44,19 +45,7 @@ class ProjectDetail(private val context: Context, val projectName: String) {
      * @param uri StorageAccessFramework等でファイルを選択するとUriがもらえるのでそれ
      * */
     fun addFileFromUri(uri: Uri) {
-        val contentResolver = context.contentResolver
-        val inputStream = contentResolver.openInputStream(uri)
-        // Uriからファイル名を出す
-        val fileName = FileTool.getFileNameFromUri(context, uri)
-        // 保存先
-        val copyFile = File(projectFolder, fileName)
-        copyFile.createNewFile()
-        val outputStream = copyFile.outputStream()
-        // 書き込む
-        inputStream?.copyTo(outputStream)
-        // リソース開放
-        inputStream?.close()
-        outputStream.close()
+        FileTool.uriFileCopy(context, uri, projectFolder.path)
     }
 
     /**
@@ -84,5 +73,19 @@ class ProjectDetail(private val context: Context, val projectName: String) {
      * @return mp4ファイルたち
      * */
     fun getProjectVideoList() = getProjectItemList().filter { file -> file.extension == "mp4" }
+
+    /**
+     * xdファイルを取り込む。多分重いのでsuspend関数
+     *
+     * @param uri StorageAccessFramework等でファイルを選択するとUriがもらえるのでそれ
+     * */
+    suspend fun importXDFile(uri: Uri) {
+        // xdファイルを展開するので一時的にフォルダを作成
+        val xdFileOpenFolder = File(projectFolder, "xd_open").apply { mkdir() }
+        val contentResolver = context.contentResolver
+        val xdFileInputStream = contentResolver.openInputStream(uri)!!
+        // XdFileToHTML 参照
+        XdFileToHTML.importXDFileToHTML(xdFileInputStream, projectFolder.path, xdFileOpenFolder.path)
+    }
 
 }

@@ -77,7 +77,7 @@ fun HtmlWebViewPreview(
                 settings.allowFileAccess = true
                 settings.mediaPlaybackRequiresUserGesture = false
                 settings.displayZoomControls = false
-                loadUrl(url)
+                loadUrl("file://$url")
             }
         }
     )
