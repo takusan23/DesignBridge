@@ -5,7 +5,7 @@ import java.io.File
 import java.net.URLConnection
 
 /** xdファイル内から画像を取り出す */
-class ResourceParse(xdFilePath: String) {
+class ResourceParse(private val xdFilePath: String) {
 
     /** resources格納パス */
     private val file = File("$xdFilePath/resources")
@@ -20,12 +20,8 @@ class ResourceParse(xdFilePath: String) {
     fun copyResource(copyFolder: String) {
         resFileList?.forEach { file ->
             // 拡張子取る
-            val extension = when (URLConnection.guessContentTypeFromStream(ByteArrayInputStream(file.readBytes()))) {
-                "image/jpeg" -> ".jpg"
-                "image/png" -> ".png"
-                else -> ""
-            }
-            File(copyFolder, "${file.name}").apply {
+            val extension = ManifestParse.getResourceMimeType(xdFilePath, file.name)
+            File(copyFolder, "${file.name}.$extension").apply {
                 createNewFile()
                 writeBytes(file.readBytes())
             }

@@ -1,14 +1,24 @@
 package io.github.takusan23.designtalk.html
 
-import io.github.takusan23.designtalk.json.graphiccontent.ArtboardChildren
+import io.github.takusan23.designtalk.json.graphiccontent.*
+import io.github.takusan23.designtalk.parse.ManifestParse
+import io.github.takusan23.designtalk.parse.ResourceParse
 import org.jsoup.nodes.Document
 
-class HtmlGenerator {
+/**
+ * HTML生成クラス
+ *
+ * @param xdOpenFolderPath xdファイルを展開したフォルダのパス
+ * */
+class HtmlGenerator(val xdOpenFolderPath: String) {
 
-    private val bodyCSS = "".trimIndent()
+    private val bodyCSS = generateCSS(mapOf())
 
     /** HTML。この中に記述していく */
     private var document = Document.createShell("/").apply {
+        head().appendElement("meta")
+            .attr("name", "viewport")
+            .attr("content", "width=device-width,initial-scale=1")
         body().attr("style", bodyCSS)
     }
 
@@ -25,7 +35,7 @@ class HtmlGenerator {
         } else {
             document.body()
                 .appendElement("div")
-                .attr("id", artboardChildren.id)
+                .attr("id", artboardChildren.name)
                 .attr("xd_name", artboardChildren.name)
                 .attr(
                     "style", when (artboardChildren.type) {
@@ -64,28 +74,28 @@ class HtmlGenerator {
                 // 図形
                 "shape" -> {
                     // 再帰的に呼ぶ
-                    when (artboardChildren.shape?.type) {
-                        "path" -> {
+                    when (artboardChildren.shape) {
+                        is ArtboardChildrenSharpPath -> {
                             // svg
                             appendElement("svg")
                                 .attr("style", generateSvgCSS(artboardChildren))
                                 // svgタグ内にpathタグを入れる
                                 .appendElement("path")
-                                .attr("d", artboardChildren.shape!!.path)
+                                .attr("d", artboardChildren.shape.path)
                         }
-                        "line" -> {
+                        is ArtboardChildrenSharpLine -> {
                             // 線
-                            val x1 = artboardChildren.shape!!.x1!!.toString()
-                            val y1 = artboardChildren.shape!!.x2!!.toString()
-                            val x2 = artboardChildren.shape!!.y1!!.toString()
-                            val y2 = artboardChildren.shape!!.y2!!.toString()
+                            val x1 = artboardChildren.shape.x1!!.toString()
+                            val y1 = artboardChildren.shape.x2!!.toString()
+                            val x2 = artboardChildren.shape.y1!!.toString()
+                            val y2 = artboardChildren.shape.y2!!.toString()
                             appendElement("svg")
                                 .attr("style", generateSvgCSS(artboardChildren))
                                 // svgタグ内にpathタグを入れる
                                 .appendElement("path")
                                 .attr("d", "M $x1 $x2 L $y1 $y2")
                         }
-                        "circle" -> {
+                        is ArtboardChildrenSharpCircle -> {
                             // 円
                             val rx = artboardChildren.shape.cx!!
                             val ry = artboardChildren.shape.cy!!
@@ -97,13 +107,15 @@ class HtmlGenerator {
                                 .attr("cx", rx.toString())
                                 .attr("cy", ry.toString())
                         }
-                        "rect" -> {
+                        is ArtboardChildrenSharpRect -> {
                             // 四角形。その他画像とかもこれ
                             val width = artboardChildren.shape.width!!.toString()
                             val height = artboardChildren.shape.height!!.toString()
                             // 画像じゃなくて四角形の描画かも
                             if (artboardChildren.style?.fill?.pattern?.meta?.ux?.uid != null) {
                                 // 画像
+                                val src = artboardChildren.style.fill.pattern.meta.ux.uid
+                                val imgExtensiton = ManifestParse.getResourceMimeType(xdOpenFolderPath, src)
                                 appendElement("img")
                                     .attr(
                                         "style", generateCSS(
@@ -114,7 +126,7 @@ class HtmlGenerator {
                                         )
                                     )
                                     .attr("id", artboardChildren.id)
-                                    .attr("src", artboardChildren.style.fill.pattern.meta.ux.uid)
+                                    .attr("src", "${artboardChildren.style.fill.pattern.meta.ux.uid}.$imgExtensiton")
                             } else {
                                 // 四角形
                                 appendElement("svg")
@@ -122,6 +134,8 @@ class HtmlGenerator {
                                     .appendElement("rect")
                                     .attr("width", width)
                                     .attr("height", height)
+                                    .attr("rx", artboardChildren.shape.r?.get(0)?.toString() ?: "0")
+                                    .attr("ry", artboardChildren.shape.r?.get(0)?.toString() ?: "0")
                             }
                         }
                     }
@@ -157,13 +171,15 @@ class HtmlGenerator {
     /** svgタグ用のCSS生成。位置などは親要素がやるので色の指定とか */
     private fun generateSvgCSS(artboardChildren: ArtboardChildren): String {
         val styleMap = mutableMapOf<String, String>()
-        // 線の色
-        styleMap["fill"] = if (artboardChildren.style?.fill?.type == "solid") generateFillRGBA(artboardChildren) else "transparent"
         // 図形の色
+        styleMap["fill"] = if (artboardChildren.style?.fill?.type == "solid") generateFillRGBA(artboardChildren) else "transparent"
+        // 線の色
         styleMap["stroke"] = if (artboardChildren.style?.stroke?.type == "solid") generateStrokeRGBA(artboardChildren) else "transparent"
         // rectの描画は多分width/heightの指定がいる
-        styleMap["height"] = artboardChildren.shape?.height?.toString() ?: "initial"
-        styleMap["width"] = artboardChildren.shape?.width?.toString() ?: "initial"
+        if (artboardChildren.shape is ArtboardChildrenSharpRect) {
+            styleMap["height"] = artboardChildren.shape.height?.toString() ?: "initial"
+            styleMap["width"] = artboardChildren.shape.width?.toString() ?: "initial"
+        }
         return generateCSS(styleMap)
     }
 

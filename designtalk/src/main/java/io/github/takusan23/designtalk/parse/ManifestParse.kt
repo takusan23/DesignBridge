@@ -5,18 +5,33 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 
-/**
- * manifestをパースする
- *
- * @param xdFilePath .xdファイルのパス
- * */
-class ManifestParse(xdFilePath: String) {
+/** xdファイルの情報などなど */
+object ManifestParse {
 
-    private val manifest = Json { ignoreUnknownKeys = true }.decodeFromString<Manifest>(File(xdFilePath, "manifest").readText())
+    /**
+     * artboard内のリソース、なぜか拡張子を消し飛ばしているので拡張子を取得する。
+     * @return pngかjpg。それ以外は空文字列
+     * */
+    fun getResourceMimeType(xdOpenFolderPath: String, uid: String): String {
+        val manifest = Json { ignoreUnknownKeys = true }.decodeFromString<Manifest>(File(xdOpenFolderPath, "manifest").readText())
+        // contentTypeとmimeTypeって違うの？
+        val mimeType = manifest.children
+            .find { manifestChildren -> manifestChildren.name == "resources" }!!
+            .components!!
+            .find { manifestChildrenComponent -> manifestChildrenComponent.path == uid }!!
+            .mimeType
+        return when (mimeType) {
+            "image/jpeg" -> "jpg"
+            "image/png" -> "png"
+            else -> ""
+        }
+    }
 
-    /** アートボードの名前配列を返す */
-    val artboardNameList = manifest.children
-        .find { manifestChildren -> manifestChildren.name == "artwork" }!!.children!!
-        .filter { manifestChildren -> manifestChildren.uxDesignBonds != null }
-
+    /** アートボードの配列を返す */
+    fun getArtboardList(xdOpenFolderPath: String) =
+        Json { ignoreUnknownKeys = true }
+            .decodeFromString<Manifest>(File(xdOpenFolderPath, "manifest").readText())
+            .children
+            .find { manifestChildren -> manifestChildren.name == "artwork" }!!.children!!
+            .filter { manifestChildren -> manifestChildren.uxDesignBonds != null }
 }

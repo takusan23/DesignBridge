@@ -59,22 +59,48 @@ data class ArtboardChildrenTransform(
 )
 
 @Serializable
-data class ArtboardChildrenSharp(
-    // type: "shape" のみ ---
-    val type: String? = null,
+abstract class ArtboardChildrenSharp {
+    @SerialName("type")
+    abstract val _type: String?
+}
+
+@Serializable
+@SerialName("path")
+data class ArtboardChildrenSharpPath(
+    override val _type: String? = null,
     val path: String? = null,
+) : ArtboardChildrenSharp()
+
+@Serializable
+@SerialName("line")
+data class ArtboardChildrenSharpLine(
+    override val _type: String? = null,
     // type: "line" のみ ---
     val x1: Int? = null,
     val y1: Int? = null,
     val x2: Int? = null,
     val y2: Int? = null,
+) : ArtboardChildrenSharp()
+
+@Serializable
+@SerialName("circle")
+data class ArtboardChildrenSharpCircle(
+    override val _type: String? = null,
     // type: "circle" のみ ---
     val cx: Float? = null,
     val cy: Float? = null,
+) : ArtboardChildrenSharp()
+
+@Serializable
+@SerialName("rect")
+data class ArtboardChildrenSharpRect(
+    override val _type: String? = null,
     // type: "rect" のみ ---
     val width: Float? = null,
     val height: Float? = null,
-)
+    val r: List<Float>? = null,
+) : ArtboardChildrenSharp()
+
 
 @Serializable
 data class ArtboardChildMeta(

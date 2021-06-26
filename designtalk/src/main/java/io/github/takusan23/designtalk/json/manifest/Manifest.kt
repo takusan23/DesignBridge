@@ -30,6 +30,15 @@ data class ManifestChildren(
     // artboardのみある
     @SerialName("uxdesign#bounds") val uxDesignBonds: uxDesignBonds? = null,
     @SerialName("children") val children: List<ManifestChildren>? = null,
+    val components: List<ManifestChildrenComponent>? = null,
+)
+
+@Serializable
+data class ManifestChildrenComponent(
+    val id: String,
+    val name: String,
+    val path: String,
+    @SerialName("type") val mimeType: String,
 )
 
 /**

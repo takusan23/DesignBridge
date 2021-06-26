@@ -37,14 +37,15 @@ object XdFileToHTML {
          * とりあえずアートボードとマニフェストからアートボードの名前を持ってくる
          * */
         val artboardFolderList = ArtboardListParse(tempFolderPath)
-        val manifestParser = ManifestParse(tempFolderPath)
+        val artboardList = ManifestParse.getArtboardList(tempFolderPath)
+
         // artboard一覧
         artboardFolderList.artboardList.forEach { artboard ->
             val children = artboard.children[0]
             // HTMLファイル作成
-            val htmlFile = File(exportFolderPath, "${manifestParser.artboardNameList.find { it.path == "artboard-${children.id}" }?.name}.html" ?: "index.html").apply { createNewFile() }
+            val htmlFile = File(exportFolderPath, "${artboardList.find { it.path == "artboard-${children.id}" }?.name}.html").apply { createNewFile() }
             // HTML描画クラス
-            val htmlGenerator = HtmlGenerator()
+            val htmlGenerator = HtmlGenerator(tempFolderPath)
             // テキスト、図形等をxdファイルの情報から組み立てる
             children.artboard.children.forEach { artboardChildren ->
                 htmlGenerator.drawHtml(artboardChildren)
