@@ -75,6 +75,12 @@ class ProjectDetail(private val context: Context, val projectName: String) {
     fun getProjectVideoList() = getProjectItemList().filter { file -> file.extension == "mp4" }
 
     /**
+     * プロジェクト内のHTMLファイルを返す
+     * @return htmlファイル
+     * */
+    fun getProjectHtmlList() = getProjectItemList().filter { file -> file.extension == "html" }
+
+    /**
      * xdファイルを取り込む。多分重いのでsuspend関数
      *
      * @param uri StorageAccessFramework等でファイルを選択するとUriがもらえるのでそれ

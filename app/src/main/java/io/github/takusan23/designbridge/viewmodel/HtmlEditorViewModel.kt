@@ -106,6 +106,24 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
         sendHtml()
     }
 
+    /**
+     * 遷移先を変更する。aタグではなくjsのwindow.locationを使ってる
+     *
+     * @param elementId 要素のID
+     * @param href リンク
+     * */
+    fun setClickLocation(elementId: String, href: String) {
+        when {
+            // 空文字列の場合は消す
+            href.isEmpty() -> document.getElementById(elementId).removeAttr("onclick")
+            // 相対パスの場合は ./ をつける
+            !(href.startsWith("https://") || href.startsWith("http://")) -> document.getElementById(elementId).attr("onclick", "window.location='./$href'")
+            // それ以外
+            else -> document.getElementById(elementId).attr("onclick", "window.location='$href'")
+        }
+        sendHtml()
+    }
+
     /** HTMLを保存する。プレビューの際もこの関数を呼んでからプレビューが表示される。一応サスペンド関数 */
     suspend fun saveHtml() = withContext(Dispatchers.IO) {
         File(editHtmlFilePath).writeText(document.html())
@@ -120,7 +138,7 @@ class HtmlEditorViewModel(application: Application, val editHtmlFilePath: String
         val inputList = document.getElementsByTag("input")
         _htmlSpanElementListLiveData.value = spanList
         _htmlImgOrVideoElementListLiveData.value = imgList + videoList
-        _htmlInputElementListLiveData.value =  inputList
+        _htmlInputElementListLiveData.value = inputList
     }
 
 }

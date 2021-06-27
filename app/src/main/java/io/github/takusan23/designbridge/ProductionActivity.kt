@@ -24,6 +24,7 @@ class ProductionActivity : AppCompatActivity() {
         val filePath = intent.getStringExtra("file_path")!!
         webView.apply {
             setWebViewClient(WebViewClient())
+            WebView.setWebContentsDebuggingEnabled(true)
             settings.javaScriptEnabled = true
             settings.builtInZoomControls = true
             settings.loadWithOverviewMode = true

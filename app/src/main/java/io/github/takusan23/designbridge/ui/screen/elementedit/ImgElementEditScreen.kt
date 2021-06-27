@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -30,12 +31,16 @@ import org.jsoup.nodes.Attributes
  * @param src 編集中テキスト
  * @param onSrcValue テキストが変更されたら呼ばれる
  * @param projectName プロジェクト名
+ * @param location 押したときの遷移先
+ * @param onLocationChange 遷移先が変わったら呼ばれる
  * */
 @Composable
 fun ImgElementEditScreen(
     src: String,
     projectName: String,
+    location: String,
     onSrcValue: (String) -> Unit,
+    onLocationChange: (String) -> Unit,
 ) {
     Column {
         OutlinedTextField(
@@ -56,7 +61,13 @@ fun ImgElementEditScreen(
         Divider(Modifier.padding(start = 5.dp, end = 5.dp))
         ProjectImgOrVideoRow(
             projectName = projectName,
-            onImageOrVideoClick = { imgName -> onSrcValue(imgName) }
+            onImageOrVideoClick = onSrcValue
+        )
+        // 押したときの遷移先ページ
+        ElementEditLocation(
+            projectName = projectName,
+            location = location,
+            onLocationChange = onLocationChange
         )
     }
 }

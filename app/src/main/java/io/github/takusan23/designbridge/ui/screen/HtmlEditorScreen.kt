@@ -18,7 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.takusan23.designbridge.R
-import io.github.takusan23.designbridge.tool.GetElementSrcOrText
+import io.github.takusan23.designbridge.tool.GetElementValue
 import io.github.takusan23.designbridge.tool.HideKeyboard
 import io.github.takusan23.designbridge.ui.component.HtmlEditorNavigationBar
 import io.github.takusan23.designbridge.ui.component.HtmlWebViewPreview
@@ -45,6 +45,9 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
     val editText = remember { mutableStateOf("") }
     // 編集中タグ
     val editTagName = remember { mutableStateOf("") }
+    // 押したときの遷移先。aタグではなくjsでlocationの値を変えてる
+    val editLocation = remember { mutableStateOf("") }
+    // BottomSheetの状態を覚えるやつ
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     // BottomSheet閉じたらキーボードも閉じる
@@ -55,6 +58,7 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
     /** ElementEditScreenで編集した値を編集中要素にセットする。 */
     fun setElementContent() {
         viewModel.changeElementTagName(editId.value, editTagName.value)
+        viewModel.setClickLocation(editId.value, editLocation.value)
         when (editTagName.value) {
             "img", "video" -> viewModel.setImgOrVideoElementSrc(editId.value, editText.value)
             "span" -> viewModel.setElementText(editId.value, editText.value)
@@ -73,12 +77,17 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                         projectName = viewModel.projectName,
                         tagName = editTagName.value,
                         textValue = editText.value,
+                        location = editLocation.value,
                         onTextChange = { text ->
                             editText.value = text
                             setElementContent()
                         },
                         onTagNameChange = { tagName ->
                             editTagName.value = tagName
+                            setElementContent()
+                        },
+                        onLocationChange = { location ->
+                            editLocation.value = location
                             setElementContent()
                         }
                     )
@@ -123,9 +132,10 @@ fun HtmlEditorScreen(viewModel: HtmlEditorViewModel) {
                                 onEditClick = {
                                     // 編集画面を開く
                                     scope.launch {
-                                        editText.value = GetElementSrcOrText.getSrcOrTextOrValue(it)
+                                        editText.value = GetElementValue.getSrcOrTextOrValue(it)
                                         editId.value = it.id()
                                         editTagName.value = it.tagName()
+                                        editLocation.value = GetElementValue.getOnClickLocationURL(it)
                                         sheetState.show()
                                     }
                                 }

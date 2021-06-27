@@ -2,7 +2,6 @@ package io.github.takusan23.designtalk.html
 
 import io.github.takusan23.designtalk.json.graphiccontent.*
 import io.github.takusan23.designtalk.parse.ManifestParse
-import io.github.takusan23.designtalk.parse.ResourceParse
 import org.jsoup.nodes.Document
 
 /**
@@ -10,7 +9,7 @@ import org.jsoup.nodes.Document
  *
  * @param xdOpenFolderPath xdファイルを展開したフォルダのパス
  * */
-class HtmlGenerator(val xdOpenFolderPath: String) {
+class HtmlGenerator(private val xdOpenFolderPath: String) {
 
     private val bodyCSS = generateCSS(mapOf())
 
@@ -51,6 +50,7 @@ class HtmlGenerator(val xdOpenFolderPath: String) {
             when (artboardChildren.type) {
                 // 文字
                 "text" -> {
+                    // aタグでspanを包む
                     appendElement("span")
                         .attr("id", artboardChildren.id)
                         .text(artboardChildren.text!!.rawText)
@@ -115,18 +115,23 @@ class HtmlGenerator(val xdOpenFolderPath: String) {
                             if (artboardChildren.style?.fill?.pattern?.meta?.ux?.uid != null) {
                                 // 画像
                                 val src = artboardChildren.style.fill.pattern.meta.ux.uid
-                                val imgExtensiton = ManifestParse.getResourceMimeType(xdOpenFolderPath, src)
+                                val imgExtension = ManifestParse.getResourceMimeType(xdOpenFolderPath, src)
+                                // aタグでimgを包む
                                 appendElement("img")
+                                    .attr("onclick", "")
                                     .attr(
                                         "style", generateCSS(
                                             mapOf(
                                                 "width" to width,
-                                                "height" to height
+                                                "height" to height,
+                                                // 以下2つは上に要素が重なったときでもonclickを拾うために
+                                                "position" to "absolute",
+                                                "z-index" to "1"
                                             )
                                         )
                                     )
                                     .attr("id", artboardChildren.id)
-                                    .attr("src", "${artboardChildren.style.fill.pattern.meta.ux.uid}.$imgExtensiton")
+                                    .attr("src", "${artboardChildren.style.fill.pattern.meta.ux.uid}.$imgExtension")
                             } else {
                                 // 四角形
                                 appendElement("svg")

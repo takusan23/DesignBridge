@@ -2,6 +2,7 @@ package io.github.takusan23.designbridge.xdhtml
 
 import android.webkit.MimeTypeMap
 import io.github.takusan23.designtalk.html.HtmlGenerator
+import io.github.takusan23.designtalk.json.graphiccontent.ArtboardChildrenSharpRect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import io.github.takusan23.designtalk.parse.ArtboardListParse
@@ -47,9 +48,12 @@ object XdFileToHTML {
             // HTML描画クラス
             val htmlGenerator = HtmlGenerator(tempFolderPath)
             // テキスト、図形等をxdファイルの情報から組み立てる
-            children.artboard.children.forEach { artboardChildren ->
-                htmlGenerator.drawHtml(artboardChildren)
-            }
+            children.artboard.children
+                // img要素を最前面にしたいので配列の最後に持っていく cssの pointer-events: none でもいいけどめんどい
+                // .sortedBy { artboardChildren -> artboardChildren.style?.fill?.pattern?.meta?.ux?.uid != null }
+                .forEach { artboardChildren ->
+                    htmlGenerator.drawHtml(artboardChildren)
+                }
             // html保存
             htmlFile.writeText(htmlGenerator.getHtml())
         }

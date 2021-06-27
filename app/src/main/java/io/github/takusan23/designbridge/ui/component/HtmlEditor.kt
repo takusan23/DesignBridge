@@ -1,58 +1,25 @@
 package io.github.takusan23.designbridge.ui.component
 
-import android.net.Uri
 import android.webkit.WebView
 import android.webkit.WebView.setWebContentsDebuggingEnabled
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.webkit.WebViewClient
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import io.github.takusan23.designbridge.R
+import io.github.takusan23.designbridge.tool.GetElementValue
 import org.jsoup.nodes.Element
-import android.webkit.WebViewClient
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.ui.Alignment
-import io.github.takusan23.designbridge.tool.GetElementSrcOrText
-
-
-/**
- * HTMLファイルをStorage Access Frameworkから取り出すボタン
- *
- * @param buttonContent ボタンの中身描画するコンポーネント。テキストとか
- * @param modifier Paddingなど
- * @param contentType 取得するファイルのMIME-Type。省略時はhtml
- * @param onResultFileUri ファイルのUriのコールバック
- * */
-@Composable
-fun OpenHtmlFileButton(
-    modifier: Modifier = Modifier,
-    onResultFileUri: (Uri) -> Unit,
-    contentType: String = "text/html",
-    buttonContent: @Composable RowScope.() -> Unit,
-) {
-    // Activity Result API
-    val callback = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri ->
-        onResultFileUri(uri)
-    }
-
-    Button(
-        modifier = modifier,
-        onClick = { callback.launch(arrayOf(contentType)) },
-        content = buttonContent
-    )
-}
 
 /**
  * WebViewを利用してHTMLをプレビューする
@@ -125,7 +92,7 @@ fun HtmlElementList(
 ) {
     LazyColumn {
         // keyが変更されたら再描画される仕組みらしい。あと多分keyが重複するので適当に対策
-        items(elementList, key = { GetElementSrcOrText.getSrcOrTextOrValue(it) + elementList.indexOf(it) }) {
+        items(elementList, key = { GetElementValue.getSrcOrTextOrValue(it) + elementList.indexOf(it) }) {
             HtmlElementListItem(it, onEditClick)
             Divider()
         }

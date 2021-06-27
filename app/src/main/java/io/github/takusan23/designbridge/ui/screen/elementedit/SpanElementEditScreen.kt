@@ -1,5 +1,6 @@
 package io.github.takusan23.designbridge.ui.screen.elementedit
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -19,24 +20,38 @@ import io.github.takusan23.designbridge.R
  *
  * @param onTextValue テキストが変更されたら呼ばれる
  * @param value 編集中テキスト
+ * @param projectName プロジェクト名
+ * @param location 押したときの遷移先
+ * @param onLocationChange 遷移先が変わったら呼ばれる
  * */
 @Composable
 fun SpanElementEditScreen(
     value: String,
+    location: String,
+    projectName: String,
     onTextValue: (String) -> Unit,
+    onLocationChange: (String) -> Unit,
 ) {
-    OutlinedTextField(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth(),
-        value = value,
-        label = { Text(text = "テキストの変更") },
-        onValueChange = { onTextValue(it) },
-        trailingIcon = {
-            // クリアボタン
-            IconButton(onClick = { onTextValue("") }) {
-                Icon(painter = painterResource(id = R.drawable.ic_outline_backspace_24), contentDescription = null)
+    Column {
+        OutlinedTextField(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+            value = value,
+            label = { Text(text = "テキストの変更") },
+            onValueChange = { onTextValue(it) },
+            trailingIcon = {
+                // クリアボタン
+                IconButton(onClick = { onTextValue("") }) {
+                    Icon(painter = painterResource(id = R.drawable.ic_outline_backspace_24), contentDescription = null)
+                }
             }
-        }
-    )
+        )
+        // 押したときの遷移先ページ
+        ElementEditLocation(
+            projectName = projectName,
+            location = location,
+            onLocationChange = onLocationChange
+        )
+    }
 }
