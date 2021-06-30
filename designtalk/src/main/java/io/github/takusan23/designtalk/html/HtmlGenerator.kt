@@ -3,6 +3,7 @@ package io.github.takusan23.designtalk.html
 import io.github.takusan23.designtalk.json.graphiccontent.*
 import io.github.takusan23.designtalk.parse.ManifestParse
 import org.jsoup.nodes.Document
+import kotlin.math.min
 
 /**
  * HTML生成クラス
@@ -51,9 +52,11 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
                 // 文字
                 "text" -> {
                     // aタグでspanを包む
-                    appendElement("span")
-                        .attr("id", artboardChildren.id)
-                        .text(artboardChildren.text!!.rawText)
+                    if (artboardChildren.text != null) {
+                        appendElement("span")
+                            .attr("id", artboardChildren.id)
+                            .text(artboardChildren.text.rawText)
+                    }
                 }
                 // グループ
                 "group" -> {
@@ -133,14 +136,22 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
                                     .attr("id", artboardChildren.id)
                                     .attr("src", "${artboardChildren.style.fill.pattern.meta.ux.uid}.$imgExtension")
                             } else {
+                                // 角丸処理
+                                var rx = 0f
+                                if (artboardChildren.shape.r != null) {
+                                    // width、height以上の角丸の値を許さない
+                                    val min = min(width.toFloat() / 2, height.toFloat() / 2)
+                                    val round = artboardChildren.shape.r?.get(0) ?: 0f
+                                    rx = min(round, min)
+                                }
                                 // 四角形
                                 appendElement("svg")
                                     .attr("style", generateSvgCSS(artboardChildren))
                                     .appendElement("rect")
                                     .attr("width", width)
                                     .attr("height", height)
-                                    .attr("rx", artboardChildren.shape.r?.get(0)?.toString() ?: "0")
-                                    .attr("ry", artboardChildren.shape.r?.get(0)?.toString() ?: "0")
+                                    .attr("rx", rx.toString())
+                                    .attr("ry", rx.toString())
                             }
                         }
                     }
@@ -195,8 +206,7 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
         val colorG = artboardChildren.style?.fill?.color?.value?.g ?: 0
         val colorB = artboardChildren.style?.fill?.color?.value?.b ?: 0
         val opacity = artboardChildren.style?.opacity ?: 0.6f
-        val alpha = 255 * opacity
-        return "rgba($colorR,$colorG,$colorB,$alpha)"
+        return "rgba($colorR,$colorG,$colorB,$opacity)"
     }
 
     /** stroke: rgba(255,255,255,0)を作る */
@@ -206,8 +216,7 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
         val colorG = artboardChildren.style?.stroke?.color?.value?.g ?: 0
         val colorB = artboardChildren.style?.stroke?.color?.value?.b ?: 0
         val opacity = artboardChildren.style?.opacity ?: 0.6f
-        val alpha = 255 * opacity
-        return "rgba($colorR,$colorG,$colorB,$alpha)"
+        return "rgba($colorR,$colorG,$colorB,$opacity)"
     }
 
     /** divタグ用のCSS生成 */

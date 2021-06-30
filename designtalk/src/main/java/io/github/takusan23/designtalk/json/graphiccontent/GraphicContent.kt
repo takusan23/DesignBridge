@@ -137,6 +137,7 @@ data class ArtboardChildFill(
     val color: ArtboardChildColor? = null,
     // "type": "pattern" のときのみ ---
     val pattern: ArtboardChildPattern? = null,
+    val alpha: Float? = null,
 )
 
 @Serializable
