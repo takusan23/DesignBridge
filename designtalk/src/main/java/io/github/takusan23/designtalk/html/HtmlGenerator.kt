@@ -191,6 +191,8 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
         styleMap["fill"] = if (artboardChildren.style?.fill?.type == "solid") generateFillRGBA(artboardChildren) else "transparent"
         // 線の色
         styleMap["stroke"] = if (artboardChildren.style?.stroke?.type == "solid") generateStrokeRGBA(artboardChildren) else "transparent"
+        // 透明度
+        styleMap["opacity"] = artboardChildren.style?.opacity?.toString() ?: "1"
         // rectの描画は多分width/heightの指定がいる
         if (artboardChildren.shape is ArtboardChildrenSharpRect) {
             styleMap["height"] = artboardChildren.shape.height?.toString() ?: "initial"
@@ -205,7 +207,7 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
         val colorR = artboardChildren.style?.fill?.color?.value?.r ?: 0
         val colorG = artboardChildren.style?.fill?.color?.value?.g ?: 0
         val colorB = artboardChildren.style?.fill?.color?.value?.b ?: 0
-        val opacity = artboardChildren.style?.opacity ?: 0.6f
+        val opacity = artboardChildren.style?.fill?.color?.alpha ?: 1f
         return "rgba($colorR,$colorG,$colorB,$opacity)"
     }
 
@@ -215,7 +217,7 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
         val colorR = artboardChildren.style?.stroke?.color?.value?.r ?: 0
         val colorG = artboardChildren.style?.stroke?.color?.value?.g ?: 0
         val colorB = artboardChildren.style?.stroke?.color?.value?.b ?: 0
-        val opacity = artboardChildren.style?.opacity ?: 0.6f
+        val opacity = artboardChildren.style?.stroke?.color?.alpha ?: 1f
         return "rgba($colorR,$colorG,$colorB,$opacity)"
     }
 

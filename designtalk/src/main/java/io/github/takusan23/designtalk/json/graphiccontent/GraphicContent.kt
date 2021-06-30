@@ -160,6 +160,7 @@ data class ArtboardChildPatternMetaUx(
 data class ArtboardChildColor(
     val mode: String,
     val value: ArtboardChildColorValue,
+    val alpha: Float? = null,
 )
 
 @Serializable
