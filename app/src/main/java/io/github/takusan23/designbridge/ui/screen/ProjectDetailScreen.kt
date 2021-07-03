@@ -1,6 +1,7 @@
 package io.github.takusan23.designbridge.ui.screen
 
 import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,8 +47,10 @@ fun ProjectDetailScreen(
         // プロジェクトに追加
         uriList.forEach { uri -> viewModel.addFileFromUri(uri) }
     }
-    val xdFileCallback = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri ->
-        viewModel.importXDFile(uri)
+    val xdFileCallback = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri != null) {
+            viewModel.importXDFile(uri)
+        }
     }
 
     // SheetContent切り替え用
