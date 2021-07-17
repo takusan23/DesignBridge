@@ -25,6 +25,9 @@ class ArtboardListParse(xdFilePath: String) {
             subclass(ArtboardChildrenSharpLine::class)
             subclass(ArtboardChildrenSharpCircle::class)
             subclass(ArtboardChildrenSharpRect::class)
+            // todo 以下２つ未実装
+            subclass(ArtboardChildrenSharpPolygon::class)
+            subclass(ArtboardChildrenSharpEclipse::class)
         }
     }
 

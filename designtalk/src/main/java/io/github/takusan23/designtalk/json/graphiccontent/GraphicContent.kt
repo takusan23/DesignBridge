@@ -76,10 +76,10 @@ data class ArtboardChildrenSharpPath(
 data class ArtboardChildrenSharpLine(
     override val _type: String? = null,
     // type: "line" のみ ---
-    val x1: Int? = null,
-    val y1: Int? = null,
-    val x2: Int? = null,
-    val y2: Int? = null,
+    val x1: Float? = null,
+    val y1: Float? = null,
+    val x2: Float? = null,
+    val y2: Float? = null,
 ) : ArtboardChildrenSharp()
 
 @Serializable
@@ -89,6 +89,18 @@ data class ArtboardChildrenSharpCircle(
     // type: "circle" のみ ---
     val cx: Float? = null,
     val cy: Float? = null,
+) : ArtboardChildrenSharp()
+
+/** 未実装 */
+@Serializable
+@SerialName("ellipse")
+data class ArtboardChildrenSharpEclipse(
+    override val _type: String? = null,
+    // type: "circle" のみ ---
+    val cx: Float? = null,
+    val cy: Float? = null,
+    val rx: Float? = null,
+    val ry: Float? = null,
 ) : ArtboardChildrenSharp()
 
 @Serializable
@@ -101,6 +113,12 @@ data class ArtboardChildrenSharpRect(
     val r: List<Float>? = null,
 ) : ArtboardChildrenSharp()
 
+/** 未実装 */
+@Serializable
+@SerialName("polygon")
+data class ArtboardChildrenSharpPolygon(
+    override val _type: String? = null,
+) : ArtboardChildrenSharp()
 
 @Serializable
 data class ArtboardChildMeta(
