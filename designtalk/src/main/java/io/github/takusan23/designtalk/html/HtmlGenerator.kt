@@ -61,18 +61,21 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
                 // グループ
                 "group" -> {
                     // 子要素を書く
-                    artboardChildren.group!!.children.forEach { children ->
-                        // Boundaryはいらん
-                        if (children.name != "Boundary") {
-                            val parentId = parentElement
-                                .appendElement("div")
-                                .attr("style", generateDivCSS(children))
-                                .attr("xd_name", children.name)
-                                .attr("id", children.id)
-                                .id()
-                            drawHtml(children, parentId)
+                    artboardChildren.group!!.children
+                        .filter { artboardChildren -> artboardChildren.id != null }
+                        .forEach { children ->
+                            // Boundaryはいらん
+                            if (children.name != "Boundary") {
+                                val parentId = parentElement
+                                    .appendElement("div")
+                                    .attr("style", generateGroupDivCSS(children))
+                                    .attr("xd_name", children.name)
+                                    .attr("dev_xd_type", children::class.java.name)
+                                    .attr("id", children.id)
+                                    .id()
+                                drawHtml(children, parentId)
+                            }
                         }
-                    }
                 }
                 // 図形
                 "shape" -> {
@@ -223,6 +226,18 @@ class HtmlGenerator(private val xdOpenFolderPath: String) {
 
     /** divタグ用のCSS生成 */
     private fun generateDivCSS(artboardChildren: ArtboardChildren): String {
+        val rgba = generateFillRGBA(artboardChildren)
+        val styleMap = mutableMapOf(
+            "left" to (artboardChildren.meta?.ux?.localTransform?.tx ?: artboardChildren.transform?.tx).toString(),
+            "top" to (artboardChildren.meta?.ux?.localTransform?.ty ?: artboardChildren.transform?.ty).toString(),
+            "position" to "absolute",
+            "color" to rgba,
+        )
+        return generateCSS(styleMap)
+    }
+
+    /** type:"group"用のDivのCSSせいせい */
+    private fun generateGroupDivCSS(artboardChildren: ArtboardChildren): String {
         val rgba = generateFillRGBA(artboardChildren)
         val styleMap = mutableMapOf(
             "left" to (artboardChildren.meta?.ux?.localTransform?.tx ?: artboardChildren.transform?.tx).toString(),

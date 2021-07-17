@@ -1,17 +1,13 @@
 package io.github.takusan23.designbridge.xdhtml
 
-import android.webkit.MimeTypeMap
 import io.github.takusan23.designtalk.html.HtmlGenerator
-import io.github.takusan23.designtalk.json.graphiccontent.ArtboardChildrenSharpRect
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import io.github.takusan23.designtalk.parse.ArtboardListParse
 import io.github.takusan23.designtalk.parse.ManifestParse
 import io.github.takusan23.designtalk.parse.ResourceParse
-import java.io.ByteArrayInputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.InputStream
-import java.net.URLConnection
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 

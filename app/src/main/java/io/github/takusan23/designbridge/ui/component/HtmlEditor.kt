@@ -4,6 +4,7 @@ import android.webkit.WebView
 import android.webkit.WebView.setWebContentsDebuggingEnabled
 import android.webkit.WebViewClient
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -166,7 +167,7 @@ private fun HtmlElementListItem(
                     "video" -> painterResource(id = R.drawable.ic_outline_local_movies_24)
                     else -> painterResource(id = R.drawable.ic_outline_text_fields_24)
                 },
-                contentDescription = null
+                contentDescription = null,
             )
             Column(
                 modifier = Modifier

@@ -37,12 +37,14 @@ data class Artboard(
  * "transform": { }
  *
  * みたいなのをパースする
+ *
+ * @param id type:"syncRef"のときnullになる
  * */
 @Serializable
 data class ArtboardChildren(
     val type: String,
     val name: String? = null,
-    val id: String,
+    val id: String? = null,
     val transform: ArtboardChildrenTransform? = null,
     val meta: ArtboardChildMeta? = null,
     val style: ArtboardChildStyle? = null,
