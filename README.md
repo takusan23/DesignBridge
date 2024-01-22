@@ -1,5 +1,7 @@
 # DesignBridge
 
+Adobe XD を解約したので、もうメンテされません。
+
 <p align="center">
 Adobe XDで作った作品をWeb Exportプラグインを利用して生成したHtmlファイルたちを編集したり全画面表示できるアプリ。
 </p>
